@@ -2,6 +2,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
+from stroked.ui import Canvas
+
 
 class StrokedApp(Gtk.Window):
     def __init__(self, width=400, height=400):
@@ -10,6 +12,9 @@ class StrokedApp(Gtk.Window):
 
         box = Gtk.Box(spacing=6)
         self.add(box)
+
+        self.canvas = Canvas()
+        box.pack_start(self.canvas, True, True, 0)
 
         self.connect('destroy', self.close)
 
