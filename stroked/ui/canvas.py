@@ -7,11 +7,15 @@ from gi.repository import Gtk, Gdk
 grid = (6, 10)
 
 class Canvas(Gtk.DrawingArea):
+    __gtype_name__ = 'Canvas'
+
     def __init__(self):
         super().__init__()
         self.path = []
 
         self.scale = None
+        self.linecap = None
+        self.linejoin = None
 
         self.connect('draw', self.draw)
         self.connect('button-press-event', self.on_mouse_press)
@@ -23,6 +27,7 @@ class Canvas(Gtk.DrawingArea):
             Gdk.EventMask.POINTER_MOTION_MASK |
             Gdk.EventMask.BUTTON_RELEASE_MASK)
 
+
     def draw(self, widget, ctx):
         scale = 1 / self.scale
 
@@ -31,8 +36,8 @@ class Canvas(Gtk.DrawingArea):
 
         ctx.set_source_rgba(1, 1, 1, 1)
         ctx.set_line_width(1)
-        ctx.set_line_cap(cairo.LineCap.ROUND)
-        ctx.set_line_join(cairo.LineJoin.ROUND)
+        ctx.set_line_cap(self.linecap)
+        ctx.set_line_join(self.linejoin)
         ctx.scale(scale, scale)
         ctx.new_path()
         if len(self.path) == 1:
@@ -65,3 +70,9 @@ class Canvas(Gtk.DrawingArea):
         if len(self.path) == 0 or self.path[-1] != point:
             self.path.append(point)
             self.queue_draw()
+
+    def on_property_changed(self, combo):
+        property_name = combo.get_name()
+        property_value = combo.get_active()
+        setattr(self, property_name, property_value)
+        self.queue_draw()

@@ -1,24 +1,41 @@
 import gi
+import os
+
 gi.require_version('Gtk', '3.0')
+from gi.repository import Gio
 from gi.repository import Gtk
 
-from stroked.ui import Canvas
+from stroked.window import StrokedWindow
 
 
-class StrokedApp(Gtk.Window):
-    def __init__(self, width=400, height=400):
-        super().__init__(title='Stroked')
-        self.set_default_size(width, height)
+class Stroked(Gtk.Application):
+    def __init__(self):
+        super().__init__(application_id='space.autre.stroked',
+                         flags=Gio.ApplicationFlags.FLAGS_NONE)
 
-        box = Gtk.Box(spacing=6)
-        self.add(box)
+        self.window = None
 
-        self.canvas = Canvas()
-        box.pack_start(self.canvas, True, True, 0)
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
 
-        self.connect('destroy', self.close)
+    def do_activate(self):
+        if not self.window:
+            self.window = StrokedWindow(self)
 
-        self.show_all()
+        self.window.present()
 
-    def close(self, window):
-        Gtk.main_quit()
+    def do_command_line(self, command_line):
+        pass
+
+    def on_about(arg):
+        pass
+
+    def on_quit(self, action, param):
+        self.quit()
+
+if __name__ == '__main__':
+    import sys
+
+    app = Stroked()
+    exit_status = app.run(sys.argv)
+    sys.exit(exit_status)
