@@ -12,7 +12,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
     def __init__(self, app):
         super().__init__(application=app, title='Stroked')
-        self.set_default_size(1000, 400)
         self.set_size_request(-1, 700)
 
 
