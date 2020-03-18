@@ -12,7 +12,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
     def __init__(self, app):
         super().__init__(application=app, title='Stroked')
-        self.set_default_size(400, 400)
+        self.set_default_size(1000, 400)
         self.set_size_request(-1, 700)
 
 
@@ -39,8 +39,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
         builder.connect_signals(canvas)
 
         canvas_settings = builder.get_object('canvas_settings')
-        for setting in canvas_settings.get_children():
-            canvas.on_property_changed(setting)
         hbox.add(canvas_settings)
 
         self.show_all()
