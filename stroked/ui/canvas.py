@@ -32,6 +32,8 @@ class Canvas(Gtk.DrawingArea):
         self.linecap = 1
         self.linejoin = 1
 
+        self.hover = None
+
         self.connect('button-press-event', self.on_mouse_press)
         self.connect('motion-notify-event', self.on_mouse_move)
         self.connect('button-release-event', self.on_mouse_release)
@@ -53,8 +55,8 @@ class Canvas(Gtk.DrawingArea):
                       ori[1] - (self.size[1] / 2 / self.scale * self.zoom))
         ctx.scale(1 / self.scale * self.zoom, 1 / self.scale * self.zoom)
 
-        self.draw_grid(ctx)
         self.draw_guides(ctx)
+        self.draw_grid(ctx)
 
         ctx.set_source_rgba(1, 1, 1, 1)
         ctx.set_line_width(self.linewidth)
@@ -69,8 +71,10 @@ class Canvas(Gtk.DrawingArea):
         else:
             for x, y in self.path:
                 ctx.line_to(x + self.margin[0], y + self.margin[1])
-
         ctx.stroke()
+
+        if self.hover is not None:
+            self.draw_selector(ctx)
 
     def draw_grid(self, ctx):
         ctx.set_source_rgb(0.13, 0.3, 0.89)
@@ -91,15 +95,37 @@ class Canvas(Gtk.DrawingArea):
             ctx.line_to(self.size[0] + 1, y + 0.5)
         ctx.stroke()
 
+    def draw_selector(self, ctx):
+        color = (1, 0, 106/255) if self.hover['in_path'] else (0.13, 0.3, 0.89)
+        ctx.set_source_rgb(*color)
+        ctx.set_line_width(self.scale * 2 / self.zoom)
+        x, y = self.hover['point']
+        ctx.arc(x + self.margin[0],
+                y + self.margin[1],
+                self.scale * 6 / self.zoom,
+                0.0,
+                2 * pi)
+        ctx.stroke()
+        if self.hover['in_path']:
+            ctx.new_path()
+            ctx.arc(x + self.margin[0],
+                    y + self.margin[1],
+                    self.scale * 2 / self.zoom,
+                    0.0,
+                    2 * pi)
+            ctx.fill()
+
     def on_mouse_move(self, widget, event):
         if event.state & Gdk.EventMask.BUTTON_PRESS_MASK:
             self.add_point(event.x, event.y)
-        if event.state & Gdk.ModifierType.BUTTON2_MASK:
+        elif event.state & Gdk.ModifierType.BUTTON2_MASK:
             ori = self.origin
             prev = self.drag
             self.origin = (ori[0] + (event.x - prev[0]), ori[1] + (event.y - prev[1]))
             self.drag = (event.x, event.y)
             self.queue_draw()
+        else:
+            self.on_hover(event.x, event.y)
 
     def on_mouse_press(self, widget, event):
         if event.button == Gdk.BUTTON_PRIMARY:
@@ -131,17 +157,29 @@ class Canvas(Gtk.DrawingArea):
         self.origin = (rect.width / 2, rect.height / 2)
         self.scale = (self.grid[1] + self.margin[1]) / rect.height
 
-    def add_point(self, x, y):
+    def screen_to_point(self, x, y):
         ori = self.origin
         translate = (ori[0] - (self.size[0] / 2 / self.scale * self.zoom),
                      ori[1] - (self.size[1] / 2 / self.scale * self.zoom))
-        point = (
-            round((x-translate[0]) * self.scale / self.zoom)-self.margin[0],
-            round((y-translate[1]) * self.scale / self.zoom)-self.margin[1]
+        return (
+            round((x-translate[0]) * self.scale / self.zoom) - self.margin[0],
+            round((y-translate[1]) * self.scale / self.zoom) - self.margin[1]
         )
+
+    def on_hover(self, x, y):
+        point = self.screen_to_point(x, y)
+        self.hover = {
+            'point': point,
+            'in_path': True if point in self.path else False
+        }
+        self.queue_draw()
+
+    def add_point(self, x, y):
+        point = self.screen_to_point(x, y)
 
         if len(self.path) == 0 or self.path[-1] != point:
             self.path.append(point)
+            self.hover = {'point': point, 'in_path': True}
             self.queue_draw()
 
     def on_property_changed(self, combo):
