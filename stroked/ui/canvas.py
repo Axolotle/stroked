@@ -16,6 +16,12 @@ class Canvas(Gtk.DrawingArea):
         self.margin = (1, 1)
         self.size = (self.grid[0] + self.margin[0], self.grid[1] + self.margin[1])
 
+        self.guides = {
+            'ascender': 2,
+            'baseline': 7,
+            'descender': 9
+        }
+
         self.scale = 0.01
         self.zoom = 1
 
@@ -48,6 +54,7 @@ class Canvas(Gtk.DrawingArea):
         ctx.scale(1 / self.scale * self.zoom, 1 / self.scale * self.zoom)
 
         self.draw_grid(ctx)
+        self.draw_guides(ctx)
 
         ctx.set_source_rgba(1, 1, 1, 1)
         ctx.set_line_width(self.linewidth)
@@ -71,10 +78,18 @@ class Canvas(Gtk.DrawingArea):
             for y in range(self.grid[1]):
                 ctx.arc(x + self.margin[0],
                         y + self.margin[1],
-                        self.scale * 5 / self.zoom,
+                        self.scale * 2 / self.zoom,
                         0.0,
                         2 * pi)
                 ctx.fill()
+
+    def draw_guides(self, ctx):
+        ctx.set_source_rgb(1, 0, 106/255)
+        ctx.set_line_width(self.scale / self.zoom)
+        for y in self.guides.values():
+            ctx.move_to(-1, y + 0.5)
+            ctx.line_to(self.size[0] + 1, y + 0.5)
+        ctx.stroke()
 
     def on_mouse_move(self, widget, event):
         if event.state & Gdk.EventMask.BUTTON_PRESS_MASK:
