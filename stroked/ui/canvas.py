@@ -11,7 +11,6 @@ class Canvas(Gtk.DrawingArea):
 
     def __init__(self):
         super().__init__()
-        self.path = []
         self.grid = (5, 9)
         self.margin = (1, 1)
         self.size = (self.grid[0] + self.margin[0], self.grid[1] + self.margin[1])
@@ -21,6 +20,9 @@ class Canvas(Gtk.DrawingArea):
             'baseline': 7,
             'descender': 9
         }
+
+        self.paths = []
+        self.path_index = None
 
         self.scale = 0.01
         self.zoom = 1
@@ -33,6 +35,8 @@ class Canvas(Gtk.DrawingArea):
         self.linejoin = 1
 
         self.hover = None
+        self.drawing = False
+        self.next_point = None
 
         self.connect('button-press-event', self.on_mouse_press)
         self.connect('motion-notify-event', self.on_mouse_move)
@@ -63,15 +67,17 @@ class Canvas(Gtk.DrawingArea):
         ctx.set_line_cap(self.linecap)
         ctx.set_line_join(self.linejoin)
 
-        ctx.new_path()
-        if len(self.path) == 1:
-            x, y = self.path[0]
-            ctx.line_to(x + self.margin[0], y + self.margin[1])
-            ctx.line_to(x + self.margin[0], y + self.margin[1])
-        else:
-            for x, y in self.path:
+        for path in self.paths:
+            ctx.new_path()
+            for x, y in path:
                 ctx.line_to(x + self.margin[0], y + self.margin[1])
-        ctx.stroke()
+            ctx.stroke()
+        # print(self.paths)
+        if self.drawing:
+            ctx.new_path()
+            for pt in [self.paths[self.path_index][-1], self.next_point]:
+                ctx.line_to(pt[0] + self.margin[0], pt[1] + self.margin[1])
+            ctx.stroke()
 
         if self.hover is not None:
             self.draw_selector(ctx)
@@ -116,22 +122,28 @@ class Canvas(Gtk.DrawingArea):
             ctx.fill()
 
     def on_mouse_move(self, widget, event):
-        if event.state & Gdk.EventMask.BUTTON_PRESS_MASK:
-            self.add_point(event.x, event.y)
-        elif event.state & Gdk.ModifierType.BUTTON2_MASK:
+        if event.state & Gdk.ModifierType.BUTTON2_MASK:
             ori = self.origin
             prev = self.drag
             self.origin = (ori[0] + (event.x - prev[0]), ori[1] + (event.y - prev[1]))
             self.drag = (event.x, event.y)
             self.queue_draw()
         else:
-            self.on_hover(event.x, event.y)
+            pt = self.screen_to_point(event.x, event.y)
+            self.on_hover(pt)
+            self.next_point = pt
 
     def on_mouse_press(self, widget, event):
         if event.button == Gdk.BUTTON_PRIMARY:
-            self.add_point(event.x, event.y)
+            self.drawing = True
+            if self.path_index is None:
+                self.paths.append([])
+                self.path_index = len(self.paths) - 1
+            pt = self.screen_to_point(event.x, event.y)
+            self.add_point(pt)
         elif event.button == Gdk.BUTTON_SECONDARY:
-            self.path = []
+            self.drawing = False
+            self.path_index = None
             self.queue_draw()
         elif event.button == Gdk.BUTTON_MIDDLE:
             self.drag = (event.x, event.y)
@@ -166,20 +178,19 @@ class Canvas(Gtk.DrawingArea):
             round((y-translate[1]) * self.scale / self.zoom) - self.margin[1]
         )
 
-    def on_hover(self, x, y):
-        point = self.screen_to_point(x, y)
+    def on_hover(self, pt):
         self.hover = {
-            'point': point,
-            'in_path': True if point in self.path else False
+            'point': pt,
+            'in_path': True if self.path_index is not None \
+                       and pt in self.paths[self.path_index] else False
         }
         self.queue_draw()
 
-    def add_point(self, x, y):
-        point = self.screen_to_point(x, y)
-
-        if len(self.path) == 0 or self.path[-1] != point:
-            self.path.append(point)
-            self.hover = {'point': point, 'in_path': True}
+    def add_point(self, pt):
+        path = self.paths[self.path_index]
+        if len(path) == 0 or path[-1] != pt:
+            path.append(pt)
+            self.hover = {'point': pt, 'in_path': True}
             self.queue_draw()
 
     def on_property_changed(self, combo):
