@@ -14,7 +14,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
         super().__init__(application=app, title='Stroked')
         self.set_size_request(-1, 700)
 
-
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(box)
 
@@ -22,20 +21,20 @@ class StrokedWindow(Gtk.ApplicationWindow):
             'stroked.data.interface', 'menubar.glade'
         ) as path:
             builder = Gtk.Builder.new_from_file(str(path))
-        builder.connect_signals(self)
+        builder.connect_signals(app)
         box.add(builder.get_object("menubar"))
 
         hbox = Gtk.Box()
         box.pack_start(hbox, True, True, 0)
 
-        canvas = Canvas()
-        hbox.pack_start(canvas, True, True, 0)
+        self.canvas = Canvas()
+        hbox.pack_start(self.canvas, True, True, 0)
 
         with importlib.resources.path(
             'stroked.data.interface', 'canvas_settings.glade'
         ) as path:
             builder = Gtk.Builder.new_from_file(str(path))
-        builder.connect_signals(canvas)
+        builder.connect_signals(self.canvas)
 
         canvas_settings = builder.get_object('canvas_settings')
         hbox.add(canvas_settings)

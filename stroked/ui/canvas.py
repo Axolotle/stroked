@@ -203,3 +203,8 @@ class Canvas(Gtk.DrawingArea):
     def on_linewidth_changed(self, elem):
         self.linewidth = round(elem.get_value(), 2)
         self.queue_draw()
+
+    def on_delete(self):
+        self.paths = []
+        self.path_index = None
+        self.queue_draw()
