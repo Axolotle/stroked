@@ -33,8 +33,8 @@ class Stroked(Gtk.Application):
     def on_quit(self, item):
         self.quit()
 
-    def on_delete(self, item):
-        self.window.canvas.on_delete()
+    def on_delete(self):
+        pass
 
 
 if __name__ == '__main__':
