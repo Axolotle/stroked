@@ -9,7 +9,7 @@ from gi.repository import Gtk, Gdk
 class Canvas(Gtk.DrawingArea):
     __gtype_name__ = 'Canvas'
 
-    def __init__(self):
+    def __init__(self, linecap=1, linejoin=1, linewidth=1):
         super().__init__()
         self.grid = (5, 9)
         self.margin = (1, 1)
@@ -30,9 +30,9 @@ class Canvas(Gtk.DrawingArea):
         self.origin = (0, 0)
         self.drag = (0, 0)
 
-        self.linewidth = 1
-        self.linecap = 1
-        self.linejoin = 1
+        self.linewidth = linewidth
+        self.linecap = linecap
+        self.linejoin = linejoin
 
         self.hover = None
         self.next_point = None
@@ -48,6 +48,10 @@ class Canvas(Gtk.DrawingArea):
             Gdk.EventMask.POINTER_MOTION_MASK |
             Gdk.EventMask.BUTTON_RELEASE_MASK |
             Gdk.EventMask.SCROLL_MASK)
+
+    def update_style(self, styles):
+        for style_name, style_value in styles.items():
+            setattr(self, style_name, style_value)
 
     def draw(self, widget, ctx):
         ctx.set_source_rgba(0.1, 0.1, 0.1, 1)
@@ -192,17 +196,6 @@ class Canvas(Gtk.DrawingArea):
         elif path[-1] == pt and len(path) == 1:
             path.append(pt)
             self.stop_drawing()
-
-    def on_property_changed(self, combo):
-        property_name = combo.get_name()
-        if property_name in ['linecap', 'linejoin']:
-            property_value = combo.get_active()
-            setattr(self, property_name, property_value)
-            self.queue_draw()
-
-    def on_linewidth_changed(self, elem):
-        self.linewidth = round(elem.get_value(), 2)
-        self.queue_draw()
 
     def on_delete(self):
         self.paths = []
