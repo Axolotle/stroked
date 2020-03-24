@@ -1,0 +1,16 @@
+<glade-catalog name="stroked" library="gladepython"
+domain="glade-3" depends="gtk+">
+ <init-function>glade_python_init</init-function>
+
+ <glade-widget-classes>
+   <glade-widget-class title="StrokedWindow" name="StrokedWindow" generic-name="strokedwindow" parent="GtkApplicationWindow"/>
+   <glade-widget-class title="Tabs" name="Tabs" generic-name="tabs" parent="GtkNotebook"/>
+   <glade-widget-class title="Canvas" name="Canvas" generic-name="canvas" parent="GtkDrawingArea"/>
+ </glade-widget-classes>
+
+ <glade-widget-group name="stroked" title="Stroked">
+   <glade-widget-class-ref name="StrokedWindow"/>
+   <glade-widget-class-ref name="Tabs"/>
+   <glade-widget-class-ref name="Canvas"/>
+ </glade-widget-group>
+</glade-catalog>

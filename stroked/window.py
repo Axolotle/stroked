@@ -3,9 +3,10 @@ import importlib.resources
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import Gdk, GObject
+from gi.repository import Gdk
 
-from stroked.ui import Canvas
+from stroked.ui import Tabs
+import stroked.settings as stg
 
 
 class StrokedWindow(Gtk.ApplicationWindow):
@@ -14,12 +15,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title='Stroked')
         self.set_size_request(-1, 700)
-
-        self.settings = {
-            'linecap': 1,
-            'linejoin': 1,
-            'linewidth': 1
-        }
 
         menu = self.build_main_menu(app)
         self.set_titlebar(menu)
@@ -33,10 +28,11 @@ class StrokedWindow(Gtk.ApplicationWindow):
         main_box = builder.get_object('main-box')
         self.add(main_box)
 
-        self.notebook = builder.get_object('notebook')
+        self.tabs = builder.get_object('tabs')
         self.glyph_list = builder.get_object('glyph-list')
         self.populate_glyph_set(self.glyph_list)
 
+        self.connect('key-press-event', self.on_keypress)
         self.show_all()
 
     def build_main_menu(self, app):
@@ -61,14 +57,18 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
     def on_glyph_click(self, widget, event, n):
         if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
-            canvas = Canvas()
-            page_num = self.notebook.append_page(canvas, Gtk.Label(chr(n)))
-            self.show_all()
-            self.notebook.set_current_page(page_num)
+            label = chr(n)
+            tab_num = self.tabs.find_num_from_tab_label(label)
+            if tab_num is None:
+                tab_num = self.tabs.add_tab(label)
+            self.tabs.set_current_page(tab_num)
 
-    def on_tab_changed(self, notebook, canvas, num):
-        if num > 0:
-            canvas.update_style(self.settings)
+    def on_keypress(self, widget, event):
+        if not event.state & Gdk.ModifierType.CONTROL_MASK:
+            return
+        key_name = Gdk.keyval_name(event.keyval)
+        if key_name == 'w':
+            self.tabs.close_tab()
 
     def on_linestyle_changed(self, elem):
         property_name = None
@@ -81,10 +81,5 @@ class StrokedWindow(Gtk.ApplicationWindow):
             property_name = elem.get_name()
             property_value = elem.get_value()
 
-        self.settings[property_name] = property_value
-
-        active_num = self.notebook.get_current_page()
-        if active_num > 0:
-            canvas = self.notebook.get_nth_page(active_num)
-            setattr(canvas, property_name, property_value)
-            canvas.queue_draw()
+        stg.set(['linestyle', property_name], property_value)
+        self.tabs.update_tab_draw()
