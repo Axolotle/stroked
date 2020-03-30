@@ -1,9 +1,8 @@
 import gi
 import os
-
+from defcon import Font
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gio
-from gi.repository import Gtk
+from gi.repository import Gio, Gtk
 
 from stroked.window import StrokedWindow
 
@@ -32,7 +31,10 @@ class Stroked(Gtk.Application):
     def set_actions(self):
         actions = [
             ['new', ['<primary>n']],
-            ['quit', ['<primary>q']]
+            ['open', ['<primary>o']],
+            ['save', ['<primary>s']],
+            ['save_as', ['<primary><shift>s']],
+            ['quit', ['<primary>q']],
         ]
 
         for name, shortcuts in actions:
@@ -49,6 +51,41 @@ class Stroked(Gtk.Application):
 
     def on_new(self, action, param):
         pass
+
+    def on_open(self, action, param):
+        dialog = Gtk.FileChooserDialog('Please choose a folder', self.window,
+            Gtk.FileChooserAction.OPEN,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        dialog.set_modal(True)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.window.filename = dialog.get_filename()
+            self.window.font = Font(path=self.window.filename)
+
+        dialog.destroy()
+
+    def on_save(self, action, param):
+        if self.window.filename is None:
+            self.on_save_as(action, param)
+        else:
+            self.window.font.save(path=self.window.filename)
+
+    def on_save_as(self, action, param):
+        dialog = Gtk.FileChooserDialog('Please choose a folder', self.window,
+            Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        dialog.set_current_name('untitled.ufo')
+        dialog.set_modal(True)
+        dialog.set_do_overwrite_confirmation(True)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            self.window.font.save(path=dialog.get_filename())
+
+        dialog.destroy()
 
     def on_delete(self):
         pass

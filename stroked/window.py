@@ -39,6 +39,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.connect('key-press-event', self.on_keypress)
 
         self.font = Font()
+        self.filename = None
 
         self.show_all()
 
