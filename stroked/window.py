@@ -2,11 +2,11 @@ import gi
 import importlib.resources
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import Gdk
+from gi.repository import Gtk, Gdk
 
-from stroked.ui import Tabs
+import stroked.ui
 import stroked.settings as stg
+from defcon import Font
 
 
 class StrokedWindow(Gtk.ApplicationWindow):
@@ -29,10 +29,17 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.add(main_box)
 
         self.tabs = builder.get_object('tabs')
+
+        self.toolbar = builder.get_object('toolbar')
+        self.toolbar.connect('notify::current-tool', self.tabs.on_tool_changed)
+
         self.glyph_list = builder.get_object('glyph-list')
         self.populate_glyph_set(self.glyph_list)
 
         self.connect('key-press-event', self.on_keypress)
+
+        self.font = Font()
+
         self.show_all()
 
     def build_main_menu(self, app):
@@ -40,7 +47,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
             'stroked.data.interface', 'menubar.glade'
         ) as path:
             builder = Gtk.Builder.new_from_file(str(path))
-        builder.connect_signals(app)
+        # builder.connect_signals(app)
 
         return builder.get_object("menubar")
 
@@ -58,9 +65,10 @@ class StrokedWindow(Gtk.ApplicationWindow):
     def on_glyph_click(self, widget, event, n):
         if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             label = chr(n)
+            glyph = self.font.newGlyph(label) if label not in self.font else self.font[label]
             tab_num = self.tabs.find_num_from_tab_label(label)
             if tab_num is None:
-                tab_num = self.tabs.add_tab(label)
+                tab_num = self.tabs.add_tab(label, glyph)
             self.tabs.set_current_page(tab_num)
 
     def on_keypress(self, widget, event):

@@ -48,7 +48,7 @@ class Stroked(Gtk.Application):
         self.quit()
 
     def on_new(self, action, param):
-        print('NEW')
+        pass
 
     def on_delete(self):
         pass

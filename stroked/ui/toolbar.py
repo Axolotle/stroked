@@ -36,6 +36,8 @@ class Toolbar(Gtk.Toolbar):
 
         tools_shorcuts = ['a', 'p']
         for num, button in enumerate(self.get_children()):
+            if num == 0:
+                self.current_tool = self.tools[0]
             button.connect('toggled', self.on_button_toggled, num)
             key, mod = Gtk.accelerator_parse(tools_shorcuts[num])
             button.get_child().add_accelerator(

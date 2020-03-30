@@ -1,7 +1,6 @@
 import gi
-
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import Gdk
 
 from stroked.ui import Canvas
 
@@ -11,9 +10,25 @@ class Tabs(Gtk.Notebook):
 
     def __init__(self):
         super().__init__()
+        self.current_tool = None
+        self.connect('switch-page', self.on_page_switched)
 
-    def add_tab(self, title):
-        canvas = Canvas()
+    @property
+    def active_object(self):
+        return self.get_nth_page(self.get_current_page())
+
+    def on_page_switched(self, tabs, tab, num):
+        if num > 0:
+            self.current_tool.set_canvas(tab)
+
+    def on_tool_changed(self, toolbar, param):
+        self.current_tool = toolbar.get_property(param.name)
+        canvas = self.active_object
+        if isinstance(canvas, Canvas):
+            self.current_tool.set_canvas(canvas)
+
+    def add_tab(self, title, glyph):
+        canvas = Canvas(glyph)
         box = Gtk.HBox(spacing=10)
         close_button = Gtk.Button.new_from_icon_name('gtk-close', Gtk.IconSize.MENU)
         close_button.set_relief(Gtk.ReliefStyle.NONE)

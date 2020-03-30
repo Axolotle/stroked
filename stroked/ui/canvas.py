@@ -1,21 +1,20 @@
-import cairo
 import gi
-from math import pi
-
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
+import cairo
+from math import pi
 
 import stroked.settings as stg
+from stroked.pens import CairoPen
 
 
 class Canvas(Gtk.DrawingArea):
     __gtype_name__ = 'Canvas'
 
-    def __init__(self):
+    def __init__(self, glyph):
         super().__init__()
-
-        self.paths = []
-        self.path_index = None
+        # self._tool = None
+        self.glyph = glyph
 
         self.scale = 0.01
         self.zoom = 1
@@ -24,12 +23,16 @@ class Canvas(Gtk.DrawingArea):
         self.drag = (0, 0)
 
         self.hover = None
-        self.next_point = None
 
-        self.connect('button-press-event', self.on_mouse_press)
-        self.connect('motion-notify-event', self.on_mouse_move)
-        self.connect('button-release-event', self.on_mouse_release)
-        self.connect('scroll-event', self.on_scroll)
+        self.connect('button-press-event',
+            lambda w, e: self._tool.on_mouse_press(w, e))
+        self.connect('motion-notify-event',
+            lambda w, e: self._tool.on_mouse_move(w, e))
+        self.connect('button-release-event',
+            lambda w, e: self._tool.on_mouse_release(w, e))
+        self.connect('scroll-event',
+            lambda w, e: self._tool.on_scroll(w, e))
+
         self.connect('size-allocate', self.on_resize)
         self.connect('draw', self.draw)
         self.set_events(self.get_events() |
@@ -39,10 +42,8 @@ class Canvas(Gtk.DrawingArea):
             Gdk.EventMask.SCROLL_MASK)
 
     @property
-    def grid_size(self):
-        grid = stg.get('grid')
-        return (grid['size'][0] + grid['margin'][0],
-                grid['size'][1] + grid['margin'][1])
+    def _tool(self):
+        return self.get_parent().current_tool
 
     def update_style(self, styles):
         for style_name, style_value in styles.items():
@@ -71,14 +72,8 @@ class Canvas(Gtk.DrawingArea):
         ctx.set_line_cap(linestyle['linecap'])
         ctx.set_line_join(linestyle['linejoin'])
 
-        for i, path in enumerate(self.paths):
-            ctx.new_path()
-            for x, y in path:
-                ctx.line_to(x + margin[0], y + margin[1])
-            if self.path_index == i and self.next_point is not None:
-                x, y = self.next_point
-                ctx.line_to(x + margin[0], y + margin[1])
-            ctx.stroke()
+        ctx.translate(margin[0], margin[1])
+        self.glyph.draw(CairoPen(ctx))
 
         if self.hover is not None:
             self.draw_selector(ctx, margin)
@@ -134,61 +129,9 @@ class Canvas(Gtk.DrawingArea):
             round((y-translate[1]) * self.scale / self.zoom) - margin[1]
         )
 
-    def add_point(self, pt):
-        path = self.paths[self.path_index]
-        if len(path) == 0 or path[-1] != pt:
-            path.append(pt)
-            self.hover = {'point': pt, 'in_path': True}
-            self.queue_draw()
-        elif path[-1] == pt and len(path) == 1:
-            path.append(pt)
-            self.stop_drawing()
-
-    def stop_drawing(self):
-        self.path_index = None
-        self.next_point = None
-        self.queue_draw()
-
-    def on_mouse_move(self, widget, event):
-        if event.state & Gdk.ModifierType.BUTTON2_MASK:
-            ori = self.origin
-            prev = self.drag
-            self.origin = (ori[0] + (event.x - prev[0]), ori[1] + (event.y - prev[1]))
-            self.drag = (event.x, event.y)
-            self.queue_draw()
-        else:
-            pt = self.screen_to_point(event.x, event.y)
-            self.on_hover(pt)
-            self.next_point = pt
-
-    def on_mouse_press(self, widget, event):
-        if event.button == Gdk.BUTTON_PRIMARY:
-            if self.path_index is None:
-                self.paths.append([])
-                self.path_index = len(self.paths) - 1
-            pt = self.screen_to_point(event.x, event.y)
-            self.add_point(pt)
-        elif event.button == Gdk.BUTTON_SECONDARY:
-            self.stop_drawing()
-        elif event.button == Gdk.BUTTON_MIDDLE:
-            self.drag = (event.x, event.y)
-
-    def on_mouse_release(self, widget, event):
-        if event.button == Gdk.BUTTON_MIDDLE:
-            ori = self.origin
-            prev = self.drag
-            self.origin = (ori[0] + (event.x - prev[0]), ori[1] + (event.y - prev[1]))
-            self.drag = (0, 0)
-            self.queue_draw()
-
-    def on_scroll(self, widget, event):
-        if event.direction == Gdk.ScrollDirection.UP:
-            self.zoom += 0.1
-        else:
-            self.zoom += -0.1
-        if self.zoom < 0.1:
-            self.zoom = 0.1
-        self.queue_draw()
+    # ╭─────────────────────╮
+    # │ GTK EVENTS HANDLERS │
+    # ╰─────────────────────╯
 
     def on_resize(self, widget, rect):
         self.origin = (rect.width / 2, rect.height / 2)

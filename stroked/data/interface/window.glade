@@ -89,7 +89,7 @@
                 <property name="is_important">True</property>
                 <property name="label" translatable="yes">Pen Tool</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">draw-path</property>
+                <property name="icon_name">draw-line</property>
                 <property name="group">select_tool</property>
               </object>
               <packing>
