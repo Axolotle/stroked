@@ -2,7 +2,8 @@ import gi
 import os
 from defcon import Font
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gio, Gtk
+from gi.repository import Gio, Gtk, Gdk
+from fontTools.ufoLib.errors import UFOLibError
 
 from stroked.window import StrokedWindow
 
@@ -12,18 +13,15 @@ class Stroked(Gtk.Application):
         super().__init__(application_id='space.autre.stroked',
                          flags=Gio.ApplicationFlags.FLAGS_NONE)
 
-        self.window = None
-
     def do_startup(self):
         Gtk.Application.do_startup(self)
 
         self.set_actions()
 
     def do_activate(self):
-        if not self.window:
-            self.window = StrokedWindow(self)
-
-        self.window.present()
+        window = self.get_active_window()
+        if window is None:
+            self.on_new(None, None)
 
     def do_command_line(self, command_line):
         pass
@@ -43,6 +41,19 @@ class Stroked(Gtk.Application):
             self.add_action(action)
             self.set_accels_for_action('app.' + name, shortcuts)
 
+    def display_error(self, primary_msg, secondary_msg=None):
+        window = self.get_active_window()
+        dialog = Gtk.MessageDialog(window, 0, Gtk.MessageType.ERROR,
+                                   Gtk.ButtonsType.CANCEL, primary_msg)
+        if secondary_msg is not None:
+            dialog.format_secondary_text(secondary_msg)
+        dialog.run()
+        dialog.destroy()
+
+    # ╭──────────────────────╮
+    # │ GTK ACTIONS HANDLERS │
+    # ╰──────────────────────╯
+
     def on_about(arg):
         pass
 
@@ -50,30 +61,57 @@ class Stroked(Gtk.Application):
         self.quit()
 
     def on_new(self, action, param):
-        pass
+        font = Font()
+        font.dirty = False
+        window = StrokedWindow(self, font)
+        window.present()
 
     def on_open(self, action, param):
-        dialog = Gtk.FileChooserDialog('Please choose a folder', self.window,
-            Gtk.FileChooserAction.OPEN,
+        window = self.get_active_window()
+
+        dialog = Gtk.FileChooserDialog('Please choose an .ufo folder', window,
+            Gtk.FileChooserAction.SELECT_FOLDER,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
              Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         dialog.set_modal(True)
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            self.window.filename = dialog.get_filename()
-            self.window.font = Font(path=self.window.filename)
+            path = dialog.get_filename()
+
+            try:
+                font = Font(path=path)
+            except UFOLibError as e:
+                dialog.destroy()
+                self.display_error(
+                    'Invalid UFO folder',
+                    'Expected .ufo folder, got {}'.format(path)
+                )
+                return
+
+            if not window.font.dirty and window.path is None:
+                window.destroy()
+
+            filename = os.path.split(path)[-1]
+            window = StrokedWindow(self, font, filename, path)
+            window.present()
 
         dialog.destroy()
 
-    def on_save(self, action, param):
-        if self.window.filename is None:
-            self.on_save_as(action, param)
-        else:
-            self.window.font.save(path=self.window.filename)
+    def on_save(self, action=None, param=None):
+        window = self.get_active_window()
 
-    def on_save_as(self, action, param):
-        dialog = Gtk.FileChooserDialog('Please choose a folder', self.window,
+        if window.path is None:
+            return self.on_save_as()
+        else:
+            window.font.save(path=window.path)
+            window.on_font_changed()
+            return True
+
+    def on_save_as(self, action=None, param=None):
+        window = self.get_active_window()
+
+        dialog = Gtk.FileChooserDialog('Please choose a folder name', window,
             Gtk.FileChooserAction.SAVE,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
              Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -82,10 +120,19 @@ class Stroked(Gtk.Application):
         dialog.set_do_overwrite_confirmation(True)
 
         response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            self.window.font.save(path=dialog.get_filename())
-
+        path = dialog.get_filename()
         dialog.destroy()
+        if response == Gtk.ResponseType.OK:
+            ext = os.path.splitext(path)[-1]
+            if ext != '.ufo':
+                path += '.ufo'
+            window.font.save(path=path)
+            window.filename = os.path.split(path)[-1]
+            window.path = path
+            window.on_font_changed()
+            return True
+        return False
+
 
     def on_delete(self):
         pass

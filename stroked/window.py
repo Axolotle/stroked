@@ -12,8 +12,9 @@ from defcon import Font
 class StrokedWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'StrokedWindow'
 
-    def __init__(self, app):
-        super().__init__(application=app, title='Stroked')
+    def __init__(self, app, font, filename='Untitled', font_path=None):
+        title = '{} - Stroked'.format(filename)
+        super().__init__(application=app, title=title)
         self.set_size_request(-1, 700)
 
         menu = self.build_main_menu(app)
@@ -36,10 +37,13 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.glyph_list = builder.get_object('glyph-list')
         self.populate_glyph_set(self.glyph_list)
 
-        self.connect('key-press-event', self.on_keypress)
+        self.font = font
+        self.filename = filename
+        self.path = font_path
+        self.font.addObserver(self, 'on_font_changed', 'Font.Changed')
 
-        self.font = Font()
-        self.filename = None
+        self.connect('key-press-event', self.on_keypress)
+        self.connect('delete-event', self.on_close)
 
         self.show_all()
 
@@ -72,13 +76,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
                 tab_num = self.tabs.add_tab(label, glyph)
             self.tabs.set_current_page(tab_num)
 
-    def on_keypress(self, widget, event):
-        if not event.state & Gdk.ModifierType.CONTROL_MASK:
-            return
-        key_name = Gdk.keyval_name(event.keyval)
-        if key_name == 'w':
-            self.tabs.close_tab()
-
     def on_linestyle_changed(self, elem):
         property_name = None
         property_value = None
@@ -92,3 +89,41 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
         stg.set(['linestyle', property_name], property_value)
         self.tabs.update_tab_draw()
+
+    # ╭─────────────────────╮
+    # │ GTK EVENTS HANDLERS │
+    # ╰─────────────────────╯
+
+    def on_keypress(self, widget, event):
+        if not event.state & Gdk.ModifierType.CONTROL_MASK:
+            return
+        key_name = Gdk.keyval_name(event.keyval)
+        if key_name == 'w':
+            self.tabs.close_tab()
+
+    def on_close(self, window, event):
+        stop = False
+        if self.font.dirty:
+            dialog = stroked.ui.dialogs.DialogSaveBeforeQuit(self)
+            response = dialog.run()
+            dialog.destroy()
+            if response == Gtk.ResponseType.YES:
+                saved = self.get_application().on_save()
+                stop = not saved
+            elif response == Gtk.ResponseType.NO:
+                stop = False
+            elif response == Gtk.ResponseType.CANCEL:
+                stop = True
+
+        return stop
+
+    # ╭────────────────────────╮
+    # │ DEFCON EVENTS HANDLERS │
+    # ╰────────────────────────╯
+
+    def on_font_changed(self, notification=None):
+        title = self.get_title()
+        dirty = '*' if self.font.dirty else ''
+        supposed_title = '{}{} - Stroked'.format(dirty, self.filename)
+        if title != supposed_title:
+            self.set_title(supposed_title)
