@@ -101,21 +101,21 @@ class StrokedWindow(Gtk.ApplicationWindow):
         if key_name == 'w':
             self.tabs.close_tab()
 
-    def on_close(self, window, event):
-        stop = False
+    def on_close(self, window=None, event=None):
+        stop_propagation = False
         if self.font.dirty:
             dialog = stroked.ui.dialogs.DialogSaveBeforeQuit(self)
             response = dialog.run()
             dialog.destroy()
             if response == Gtk.ResponseType.YES:
                 saved = self.get_application().on_save()
-                stop = not saved
+                stop_propagation = not saved
             elif response == Gtk.ResponseType.NO:
-                stop = False
+                stop_propagation = False
             elif response == Gtk.ResponseType.CANCEL:
-                stop = True
+                stop_propagation = True
 
-        return stop
+        return stop_propagation
 
     # ╭────────────────────────╮
     # │ DEFCON EVENTS HANDLERS │

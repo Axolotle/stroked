@@ -58,6 +58,12 @@ class Stroked(Gtk.Application):
         pass
 
     def on_quit(self, action, param):
+        for window in self.get_windows():
+            keep_open = window.on_close()
+            if keep_open:
+                return
+            else:
+                window.destroy()
         self.quit()
 
     def on_new(self, action, param):
