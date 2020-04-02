@@ -21,7 +21,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.set_titlebar(menu)
 
         with importlib.resources.path(
-            'stroked.data.interface', 'window.glade'
+            'stroked.data.ui', 'window.ui'
         ) as path:
             builder = Gtk.Builder.new_from_file(str(path))
         builder.connect_signals(self)
@@ -49,7 +49,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
     def build_main_menu(self, app):
         with importlib.resources.path(
-            'stroked.data.interface', 'menubar.glade'
+            'stroked.data.ui', 'menubar.ui'
         ) as path:
             builder = Gtk.Builder.new_from_file(str(path))
         # builder.connect_signals(app)
