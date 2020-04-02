@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/space/autre/stroked">
-    <file>ui/simple_dialogs.ui</file>
-  </gresource>
+    <gresource prefix="/space/autre/stroked">
+        <file preprocess="xml-stripblanks">ui/window.ui</file>
+        <file preprocess="xml-stripblanks">ui/menubar.ui</file>
+        <file preprocess="xml-stripblanks">ui/simple_dialogs.ui</file>
+    </gresource>
 </gresources>

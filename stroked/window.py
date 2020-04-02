@@ -8,52 +8,30 @@ from stroked.ui import dialogs
 import stroked.settings as stg
 
 
+@Gtk.Template.from_resource('/space/autre/stroked/ui/window.ui')
 class StrokedWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'StrokedWindow'
+
+    tabs = Gtk.Template.Child('tabs')
+    toolbar = Gtk.Template.Child('toolbar')
+    glyph_list = Gtk.Template.Child('glyph-list')
 
     def __init__(self, app, font, filename='Untitled', font_path=None):
         title = '{} - Stroked'.format(filename)
         super().__init__(application=app, title=title)
-        self.set_size_request(-1, 700)
 
-        menu = self.build_main_menu(app)
-        self.set_titlebar(menu)
+        builder = Gtk.Builder.new_from_resource(
+            '/space/autre/stroked/ui/menubar.ui')
+        self.set_titlebar(builder.get_object('menubar'))
 
-        with importlib.resources.path(
-            'stroked.data.ui', 'window.ui'
-        ) as path:
-            builder = Gtk.Builder.new_from_file(str(path))
-        builder.connect_signals(self)
-
-        main_box = builder.get_object('main-box')
-        self.add(main_box)
-
-        self.tabs = builder.get_object('tabs')
-
-        self.toolbar = builder.get_object('toolbar')
         self.toolbar.connect('notify::current-tool', self.tabs.on_tool_changed)
 
-        self.glyph_list = builder.get_object('glyph-list')
         self.populate_glyph_set(self.glyph_list)
 
         self.font = font
         self.filename = filename
         self.path = font_path
         self.font.addObserver(self, 'on_font_changed', 'Font.Changed')
-
-        self.connect('key-press-event', self.on_keypress)
-        self.connect('delete-event', self.on_close)
-
-        self.show_all()
-
-    def build_main_menu(self, app):
-        with importlib.resources.path(
-            'stroked.data.ui', 'menubar.ui'
-        ) as path:
-            builder = Gtk.Builder.new_from_file(str(path))
-        # builder.connect_signals(app)
-
-        return builder.get_object("menubar")
 
     def populate_glyph_set(self, glyph_set):
         glyphs = range(32, 127)
@@ -65,6 +43,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
             button.connect('button-press-event', self.on_glyph_click, glyph)
             child.add(button)
             glyph_set.add(child)
+        glyph_set.show_all()
 
     def on_glyph_click(self, widget, event, n):
         if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
@@ -75,7 +54,12 @@ class StrokedWindow(Gtk.ApplicationWindow):
                 tab_num = self.tabs.add_tab(label, glyph)
             self.tabs.set_current_page(tab_num)
 
-    def on_linestyle_changed(self, elem):
+    # ╭─────────────────────╮
+    # │ GTK EVENTS HANDLERS │
+    # ╰─────────────────────╯
+
+    @Gtk.Template.Callback('on_linestyle_changed')
+    def _on_linestyle_changed(self, elem):
         property_name = None
         property_value = None
         if isinstance(elem, Gtk.ComboBox):
@@ -89,18 +73,16 @@ class StrokedWindow(Gtk.ApplicationWindow):
         stg.set(['linestyle', property_name], property_value)
         self.tabs.update_tab_draw()
 
-    # ╭─────────────────────╮
-    # │ GTK EVENTS HANDLERS │
-    # ╰─────────────────────╯
-
-    def on_keypress(self, widget, event):
+    @Gtk.Template.Callback('on_keypress')
+    def _on_keypress(self, widget, event):
         if not event.state & Gdk.ModifierType.CONTROL_MASK:
             return
         key_name = Gdk.keyval_name(event.keyval)
         if key_name == 'w':
             self.tabs.close_tab()
 
-    def on_close(self, window=None, event=None):
+    @Gtk.Template.Callback('on_close')
+    def _on_close(self, window=None, event=None):
         stop_propagation = False
         if self.font.dirty:
             dialog = dialogs.DialogAskSave(self)
