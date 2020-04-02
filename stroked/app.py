@@ -1,10 +1,14 @@
-import gi
 import os
-from defcon import Font
+import signal
+
+import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, Gtk, Gdk
-from fontTools.ufoLib.errors import UFOLibError
 
+from fontTools.ufoLib.errors import UFOLibError
+from defcon import Font
+
+import stroked.resources
 from stroked.window import StrokedWindow
 
 
@@ -15,6 +19,8 @@ class Stroked(Gtk.Application):
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
+        # allow forced shutdown to quit silently
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
         self.set_actions()
 
@@ -144,9 +150,13 @@ class Stroked(Gtk.Application):
         pass
 
 
-if __name__ == '__main__':
+def main():
     import sys
 
     app = Stroked()
     exit_status = app.run(sys.argv)
     sys.exit(exit_status)
+
+
+if __name__ == '__main__':
+    main()

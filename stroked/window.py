@@ -1,12 +1,11 @@
-import gi
 import importlib.resources
 
-gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
-import stroked.ui
-import stroked.settings as stg
 from defcon import Font
+
+from stroked.ui import dialogs
+import stroked.settings as stg
 
 
 class StrokedWindow(Gtk.ApplicationWindow):
@@ -104,7 +103,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
     def on_close(self, window=None, event=None):
         stop_propagation = False
         if self.font.dirty:
-            dialog = stroked.ui.dialogs.DialogSaveBeforeQuit(self)
+            dialog = dialogs.DialogAskSave(self)
             response = dialog.run()
             dialog.destroy()
             if response == Gtk.ResponseType.YES:
