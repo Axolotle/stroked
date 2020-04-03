@@ -4,6 +4,7 @@
  <glade-widget-classes>
    <glade-widget-class title="StrokedWindow" name="StrokedWindow" generic-name="strokedwindow" parent="GtkApplicationWindow"/>
    <glade-widget-class title="Tabs" name="Tabs" generic-name="tabs" parent="GtkNotebook"/>
+   <glade-widget-class title="GlyphList" name="GlyphList" generic-name="glyphlist" parent="GtkFlowBox"/>
    <glade-widget-class title="Toolbar" name="Toolbar" generic-name="toolbar" parent="GtkToolbar"/>
    <glade-widget-class title="Canvas" name="Canvas" generic-name="canvas" parent="GtkDrawingArea"/>
    <glade-widget-class title="DialogAskSave" name="DialogAskSave" generic-name="dialogasksave" parent="GtkDialog"/>
@@ -12,6 +13,7 @@
  <glade-widget-group name="stroked" title="Stroked">
    <glade-widget-class-ref name="StrokedWindow"/>
    <glade-widget-class-ref name="Tabs"/>
+   <glade-widget-class-ref name="GlyphList"/>
    <glade-widget-class-ref name="Toolbar"/>
    <glade-widget-class-ref name="Canvas"/>
    <glade-widget-class-ref name="DialogAskSave"/>

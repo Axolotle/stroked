@@ -12,9 +12,8 @@ import stroked.settings as stg
 class StrokedWindow(Gtk.ApplicationWindow):
     __gtype_name__ = 'StrokedWindow'
 
-    tabs = Gtk.Template.Child('tabs')
     toolbar = Gtk.Template.Child('toolbar')
-    glyph_list = Gtk.Template.Child('glyph-list')
+    tabs = Gtk.Template.Child('tabs')
 
     def __init__(self, app, font, filename='Untitled', font_path=None):
         title = '{} - Stroked'.format(filename)
@@ -26,33 +25,10 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
         self.toolbar.connect('notify::current-tool', self.tabs.on_tool_changed)
 
-        self.populate_glyph_set(self.glyph_list)
-
         self.font = font
         self.filename = filename
         self.path = font_path
         self.font.addObserver(self, 'on_font_changed', 'Font.Changed')
-
-    def populate_glyph_set(self, glyph_set):
-        glyphs = range(32, 127)
-
-        for glyph in glyphs:
-            child = Gtk.FlowBoxChild(can_focus=False)
-            child.set_size_request(60, 75)
-            button = Gtk.Button(label=chr(glyph))
-            button.connect('button-press-event', self.on_glyph_click, glyph)
-            child.add(button)
-            glyph_set.add(child)
-        glyph_set.show_all()
-
-    def on_glyph_click(self, widget, event, n):
-        if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
-            label = chr(n)
-            glyph = self.font.newGlyph(label) if label not in self.font else self.font[label]
-            tab_num = self.tabs.find_num_from_tab_label(label)
-            if tab_num is None:
-                tab_num = self.tabs.add_tab(label, glyph)
-            self.tabs.set_current_page(tab_num)
 
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │

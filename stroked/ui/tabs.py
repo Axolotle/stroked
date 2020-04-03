@@ -1,31 +1,19 @@
-import gi
-gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 from stroked.ui import Canvas
 
 
+@Gtk.Template.from_resource('/space/autre/stroked/ui/tabs.ui')
 class Tabs(Gtk.Notebook):
     __gtype_name__ = 'Tabs'
 
     def __init__(self):
         super().__init__()
         self.current_tool = None
-        self.connect('switch-page', self.on_page_switched)
 
     @property
     def active_object(self):
         return self.get_nth_page(self.get_current_page())
-
-    def on_page_switched(self, tabs, tab, num):
-        if num > 0:
-            self.current_tool.set_canvas(tab)
-
-    def on_tool_changed(self, toolbar, param):
-        self.current_tool = toolbar.get_property(param.name)
-        canvas = self.active_object
-        if isinstance(canvas, Canvas):
-            self.current_tool.set_canvas(canvas)
 
     def add_tab(self, title, glyph):
         canvas = Canvas(glyph)
@@ -74,3 +62,22 @@ class Tabs(Gtk.Notebook):
         num = self.find_num_from_tab_object(tab)
         if num is not None:
             self.close_tab(num)
+
+    # ╭─────────────────────╮
+    # │ GTK EVENTS HANDLERS │
+    # ╰─────────────────────╯
+
+    @Gtk.Template.Callback('on_page_switched')
+    def _on_page_switched(self, tabs, tab, num):
+        if num > 0:
+            self.current_tool.set_canvas(tab)
+
+    # ╭────────────╮
+    # │ GTK NOTIFY │
+    # ╰────────────╯
+
+    def on_tool_changed(self, toolbar, param):
+        self.current_tool = toolbar.get_property(param.name)
+        canvas = self.active_object
+        if isinstance(canvas, Canvas):
+            self.current_tool.set_canvas(canvas)
