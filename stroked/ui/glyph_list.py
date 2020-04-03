@@ -18,28 +18,30 @@ class GlyphList(Gtk.FlowBox):
         return self.get_toplevel().font
 
     def populate(self):
-        glyphs = range(32, 127)
-
-        for glyph in glyphs:
-            child = Gtk.FlowBoxChild(can_focus=False)
-            child.set_size_request(60, 75)
-            button = Gtk.Button(label=chr(glyph))
-            button.connect('button-press-event', self.on_glyph_click, glyph)
-            child.add(button)
-            self.add(child)
+        for glyph in range(32, 127):
+            self.add(GlyphItem(chr(glyph)))
         self.show_all()
 
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │
     # ╰─────────────────────╯
 
-    def on_glyph_click(self, widget, event, n):
+    @Gtk.Template.Callback('on_glyph_clicked')
+    def _on_glyph_clicked(self, glyph_list, glyph_item):
         font = self.font
         tabs = self.tabs
-        if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
-            label = chr(n)
-            glyph = font.newGlyph(label) if label not in font else font[label]
-            tab_num = tabs.find_num_from_tab_label(label)
-            if tab_num is None:
-                tab_num = tabs.add_tab(label, glyph)
-            tabs.set_current_page(tab_num)
+        label = glyph_item.get_child().get_label()
+        glyph = font.newGlyph(label) if label not in font else font[label]
+        tab_num = tabs.find_num_from_tab_label(label)
+        if tab_num is None:
+            tab_num = tabs.add_tab(label, glyph)
+        tabs.set_current_page(tab_num)
+
+
+class GlyphItem(Gtk.FlowBoxChild):
+    __gtype_name__ = 'GlyphItem'
+
+    def __init__(self, label):
+        super().__init__()
+        self.set_size_request(60, 75)
+        self.add(Gtk.Label(label=label))
