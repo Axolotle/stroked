@@ -1,6 +1,3 @@
-import gi
-
-gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk
 
 from .base_tool import BaseTool
@@ -16,23 +13,16 @@ class PenTool(BaseTool):
     # ╰─────────────────────╯
 
     def on_mouse_press(self, canvas, event):
+        super().on_mouse_press(canvas, event)
         if event.button == Gdk.BUTTON_PRIMARY:
-            pt = canvas.screen_to_point(event.x, event.y)
-            self.add_point(canvas.glyph, pt)
-            canvas.queue_draw()
+            self.add_point(canvas.glyph, canvas.mouse_pos)
         elif event.button == Gdk.BUTTON_SECONDARY:
-             self.stop_drawing()
-             canvas.queue_draw()
-        else:
-            super().on_mouse_press(canvas, event)
-            return
+            self.stop_drawing()
 
     def on_mouse_move(self, canvas, event):
-        if self.is_drawing:
-            pt = canvas.screen_to_point(event.x, event.y)
-            self.update_last_point(canvas.glyph, pt)
-            canvas.queue_draw()
         super().on_mouse_move(canvas, event)
+        if self.is_drawing:
+            self.update_last_point(canvas.glyph, canvas.mouse_pos)
 
     # ╭──────────────╮
     # │ TOOL METHODS │

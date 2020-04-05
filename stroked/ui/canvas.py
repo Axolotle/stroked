@@ -1,8 +1,7 @@
-import gi
-gi.require_version('Gtk', '3.0')
+from math import pi
+
 from gi.repository import Gtk, Gdk
 import cairo
-from math import pi
 
 import stroked.settings as stg
 from stroked.pens import CairoPen
@@ -13,7 +12,7 @@ class Canvas(Gtk.DrawingArea):
 
     def __init__(self, glyph):
         super().__init__()
-        # self._tool = None
+
         self.glyph = glyph
 
         self.scale = 0.01
@@ -21,33 +20,31 @@ class Canvas(Gtk.DrawingArea):
 
         self.origin = (0, 0)
         self.drag = (0, 0)
+        self.mouse_pos = None
 
         self.hover = None
 
         self.connect('button-press-event',
-            lambda w, e: self._tool.on_mouse_press(w, e))
+                     lambda w, e: self._tool.on_mouse_press(w, e))
         self.connect('motion-notify-event',
-            lambda w, e: self._tool.on_mouse_move(w, e))
+                     lambda w, e: self._tool.on_mouse_move(w, e))
         self.connect('button-release-event',
-            lambda w, e: self._tool.on_mouse_release(w, e))
+                     lambda w, e: self._tool.on_mouse_release(w, e))
         self.connect('scroll-event',
-            lambda w, e: self._tool.on_scroll(w, e))
+                     lambda w, e: self._tool.on_scroll(w, e))
 
         self.connect('size-allocate', self.on_resize)
         self.connect('draw', self.draw)
-        self.set_events(self.get_events() |
-            Gdk.EventMask.BUTTON_PRESS_MASK |
-            Gdk.EventMask.POINTER_MOTION_MASK |
-            Gdk.EventMask.BUTTON_RELEASE_MASK |
-            Gdk.EventMask.SCROLL_MASK)
+        self.set_events(
+            self.get_events()
+            | Gdk.EventMask.BUTTON_PRESS_MASK
+            | Gdk.EventMask.POINTER_MOTION_MASK
+            | Gdk.EventMask.BUTTON_RELEASE_MASK
+            | Gdk.EventMask.SCROLL_MASK)
 
     @property
     def _tool(self):
         return self.get_parent().current_tool
-
-    def update_style(self, styles):
-        for style_name, style_value in styles.items():
-            setattr(self, style_name, style_value)
 
     def draw(self, widget, ctx):
         grid = stg.get('grid')
@@ -74,6 +71,8 @@ class Canvas(Gtk.DrawingArea):
 
         ctx.translate(margin[0], margin[1])
         self.glyph.draw(CairoPen(ctx))
+        if self.mouse_pos:
+            self._tool.draw_cursor(ctx, self.mouse_pos)
 
         if self.hover is not None:
             self.draw_selector(ctx, margin)
