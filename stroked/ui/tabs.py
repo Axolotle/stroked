@@ -18,7 +18,8 @@ class Tabs(Gtk.Notebook):
     def add_tab(self, title, glyph):
         canvas = Canvas(glyph)
         box = Gtk.HBox(spacing=10)
-        close_button = Gtk.Button.new_from_icon_name('gtk-close', Gtk.IconSize.MENU)
+        close_button = Gtk.Button.new_from_icon_name(
+            'gtk-close', Gtk.IconSize.MENU)
         close_button.set_relief(Gtk.ReliefStyle.NONE)
         close_button.connect('clicked', self.on_tab_close, canvas)
 

@@ -1,8 +1,4 @@
-import importlib.resources
-
 from gi.repository import Gtk, Gdk
-
-from defcon import Font
 
 from stroked.ui import dialogs
 import stroked.settings as stg

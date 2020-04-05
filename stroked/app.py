@@ -3,7 +3,7 @@ import signal
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gio, Gtk, Gdk
+from gi.repository import Gio, Gtk
 
 from fontTools.ufoLib.errors import UFOLibError
 from defcon import Font
@@ -81,7 +81,8 @@ class Stroked(Gtk.Application):
     def on_open(self, action, param):
         window = self.get_active_window()
 
-        dialog = Gtk.FileChooserDialog('Please choose an .ufo folder', window,
+        dialog = Gtk.FileChooserDialog(
+            'Please choose an .ufo folder', window,
             Gtk.FileChooserAction.SELECT_FOLDER,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
              Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -93,7 +94,7 @@ class Stroked(Gtk.Application):
 
             try:
                 font = Font(path=path)
-            except UFOLibError as e:
+            except UFOLibError:
                 dialog.destroy()
                 self.display_error(
                     'Invalid UFO folder',
@@ -123,7 +124,8 @@ class Stroked(Gtk.Application):
     def on_save_as(self, action=None, param=None):
         window = self.get_active_window()
 
-        dialog = Gtk.FileChooserDialog('Please choose a folder name', window,
+        dialog = Gtk.FileChooserDialog(
+            'Please choose a folder name', window,
             Gtk.FileChooserAction.SAVE,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
              Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -144,7 +146,6 @@ class Stroked(Gtk.Application):
             window.on_font_changed()
             return True
         return False
-
 
     def on_delete(self):
         pass
