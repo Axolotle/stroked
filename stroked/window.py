@@ -1,4 +1,4 @@
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, Gio
 
 from stroked.ui import dialogs
 import stroked.settings as stg
@@ -19,12 +19,38 @@ class StrokedWindow(Gtk.ApplicationWindow):
             '/space/autre/stroked/ui/menubar.ui')
         self.set_titlebar(builder.get_object('menubar'))
 
+        self.set_actions(app)
+
         self.toolbar.connect('notify::current-tool', self.tabs.on_tool_changed)
 
         self.font = font
         self.filename = filename
         self.path = font_path
         self.font.addObserver(self, 'on_font_changed', 'Font.Changed')
+
+    def set_actions(self, app):
+        actions = [
+            ['font_info', ['<primary>i']],
+        ]
+
+        for name, shortcuts in actions:
+            action = Gio.SimpleAction.new(name, None)
+            action.connect('activate', getattr(self, 'on_' + name))
+            self.add_action(action)
+            app.set_accels_for_action('win.' + name, shortcuts)
+
+    # ╭──────────────────────╮
+    # │ GTK ACTIONS HANDLERS │
+    # ╰──────────────────────╯
+
+    def on_font_info(self, action, param):
+        dialog = dialogs.DialogFontInfo(self)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.APPLY:
+            info, lib = dialog.dehydrate()
+            self.font.info.setDataFromSerialization(info)
+        dialog.destroy()
 
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │
