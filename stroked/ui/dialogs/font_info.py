@@ -3,10 +3,6 @@ from datetime import datetime
 from gi.repository import Gtk
 
 
-def set_widget_value(widget, value):
-
-
-
 class DateEntry(Gtk.Entry, Gtk.Editable):
     __gtype_name__ = 'DateEntry'
 
