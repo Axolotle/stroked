@@ -44,13 +44,8 @@ class StrokedWindow(Gtk.ApplicationWindow):
     # ╰──────────────────────╯
 
     def on_font_info(self, action, param):
-        dialog = dialogs.DialogFontInfo(self)
-
-        response = dialog.run()
-        if response == Gtk.ResponseType.APPLY:
-            info, lib = dialog.dehydrate()
-            self.font.info.setDataFromSerialization(info)
-        dialog.destroy()
+        dialog = dialogs.WindowFontInfo(self)
+        dialog.show()
 
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │

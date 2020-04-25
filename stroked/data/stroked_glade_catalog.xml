@@ -9,7 +9,7 @@
    <glade-widget-class title="Canvas" name="Canvas" generic-name="canvas" parent="GtkDrawingArea"/>
    <glade-widget-class title="DialogAskSave" name="DialogAskSave" generic-name="dialogasksave" parent="GtkDialog"/>
    <glade-widget-class title="DateEntry" name="DateEntry" generic-name="dateentry" parent="GtkEntry"/>
-   <glade-widget-class title="DialogFontInfo" name="DialogFontInfo" generic-name="dialogfontinfo" parent="GtkDialog"/>
+   <glade-widget-class title="WindowFontInfo" name="WindowFontInfo" generic-name="windowfontinfo" parent="GtkWindow"/>
  </glade-widget-classes>
 
  <glade-widget-group name="stroked" title="Stroked">
@@ -20,6 +20,6 @@
    <glade-widget-class-ref name="Canvas"/>
    <glade-widget-class-ref name="DialogAskSave"/>
    <glade-widget-class-ref name="DateEntry"/>
-   <glade-widget-class-ref name="DialogFontInfo"/>
+   <glade-widget-class-ref name="WindowFontInfo"/>
  </glade-widget-group>
 </glade-catalog>
