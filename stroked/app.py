@@ -6,9 +6,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gio, Gtk
 
 from fontTools.ufoLib.errors import UFOLibError
-from defcon import Font
 
 import stroked.resources
+from stroked.font import Font
 from stroked.window import StrokedWindow
 
 
