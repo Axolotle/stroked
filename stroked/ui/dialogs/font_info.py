@@ -42,10 +42,14 @@ class WindowFontInfo(Gtk.Window):
     gridWidth = Gtk.Template.Child('grid-width-spin-button')
     gridHeight = Gtk.Template.Child('grid-height-spin-button')
 
+    masters_stack = Gtk.Template.Child('masters-stack')
+    masters_stack_bar = Gtk.Template.Child('masters-stack-bar')
+
     def __init__(self, window):
         super().__init__(title='Font Info ' + window.filename,
                          transient_for=window)
 
+        self.font = window.font
         self.lib = window.font.lib
         self.info = window.font.info
         self.hydrate()
@@ -70,6 +74,11 @@ class WindowFontInfo(Gtk.Window):
                         widget.get_adjustment().set_value(value)
                     elif isinstance(widget, (Gtk.Entry, DateEntry)):
                         widget.set_text(value)
+
+        for layer in self.font.layers:
+            name = layer.name.split('.')[1]
+            stack_item = StackItemMaster(self.lib['masters'][name])
+            self.masters_stack.add_titled(stack_item, name, name)
 
     def edit_info(self, prop, value):
         if value != getattr(self.info, prop):
@@ -107,3 +116,46 @@ class WindowFontInfo(Gtk.Window):
         value = int(widget.get_adjustment().get_value())
         widget.set_text('{:03d}'.format(value))
         return True
+
+
+@Gtk.Template.from_resource('/space/autre/stroked/ui/master_stack_item.ui')
+class StackItemMaster(Gtk.Box):
+    __gtype_name__ = 'StackItemMaster'
+
+    weight = Gtk.Template.Child('weight-combo')
+    width = Gtk.Template.Child('width-combo')
+
+    ascender = Gtk.Template.Child('ascender-adj')
+    capHeight = Gtk.Template.Child('capHeight-adj')
+    xHeight = Gtk.Template.Child('xHeight-adj')
+    descender = Gtk.Template.Child('descender-adj')
+
+    def __init__(self, data):
+        super().__init__()
+
+        self.data = data
+        self.hydrate()
+
+        for prop in self.__gtktemplate_widgets__.values():
+            widget = getattr(self, prop)
+            if isinstance(widget, Gtk.Adjustment):
+                widget.connect('value-changed', self.on_changed, prop)
+            else:
+                widget.connect('changed', self.on_changed, prop)
+
+    def hydrate(self):
+        for attr_name, value in self.data.items():
+            if value and hasattr(self, attr_name):
+                widget = getattr(self, attr_name)
+                if isinstance(widget, Gtk.Adjustment):
+                    widget.set_value(value)
+                elif isinstance(widget, Gtk.ComboBox):
+                    widget.set_active_id(str(value))
+
+    def on_changed(self, widget, prop):
+        if isinstance(widget, Gtk.Adjustment):
+            value = int(widget.get_value())
+        elif isinstance(widget, Gtk.ComboBox):
+            value = int(widget.get_active_id())
+
+        self.data[prop] = value
