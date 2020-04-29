@@ -3,24 +3,24 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <requires lib="stroked" version="0.0"/>
-  <object class="GtkAdjustment" id="grid-height-number">
+  <object class="GtkAdjustment" id="grid-height-adj">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="grid-width-number">
+  <object class="GtkAdjustment" id="grid-width-adj">
     <property name="upper">100</property>
     <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkAdjustment" id="version-major-number">
+  <object class="GtkAdjustment" id="version-major-adj">
     <property name="upper">999</property>
     <property name="value">1</property>
     <property name="step_increment">1</property>
     <property name="page_increment">5</property>
   </object>
-  <object class="GtkAdjustment" id="version-minor-number">
+  <object class="GtkAdjustment" id="version-minor-adj">
     <property name="upper">999</property>
     <property name="step_increment">1</property>
     <property name="page_increment">100</property>
@@ -229,7 +229,7 @@
                             <property name="margin_top">3</property>
                             <property name="margin_bottom">3</property>
                             <property name="input_purpose">number</property>
-                            <property name="adjustment">version-major-number</property>
+                            <property name="adjustment">version-major-adj</property>
                             <property name="numeric">True</property>
                           </object>
                           <packing>
@@ -260,7 +260,7 @@
                             <property name="margin_bottom">3</property>
                             <property name="text" translatable="yes">1,000</property>
                             <property name="input_purpose">number</property>
-                            <property name="adjustment">version-minor-number</property>
+                            <property name="adjustment">version-minor-adj</property>
                             <property name="numeric">True</property>
                           </object>
                           <packing>
@@ -361,7 +361,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="text" translatable="yes">10</property>
-                        <property name="adjustment">grid-width-number</property>
+                        <property name="adjustment">grid-width-adj</property>
                         <property name="numeric">True</property>
                         <property name="value">10</property>
                       </object>
@@ -375,7 +375,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="text" translatable="yes">10</property>
-                        <property name="adjustment">grid-height-number</property>
+                        <property name="adjustment">grid-height-adj</property>
                         <property name="numeric">True</property>
                         <property name="value">10</property>
                       </object>
@@ -444,29 +444,88 @@
           <object class="GtkBox" id="masters-page">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkStackSidebar" id="masters-stack-bar">
+              <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="stack">masters-stack</property>
+                <child>
+                  <object class="GtkStackSidebar" id="masters-stack-bar">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="stack">masters-stack</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkStack" id="masters-stack">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">15</property>
+                    <property name="margin_right">15</property>
+                    <property name="margin_top">15</property>
+                    <property name="margin_bottom">15</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkStack" id="masters-stack">
+              <object class="GtkToolbar">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="toolbar_style">icons</property>
+                <property name="icon_size">2</property>
                 <child>
-                  <placeholder/>
+                  <object class="GtkToolButton" id="master-add-button">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">add a master</property>
+                    <property name="label" translatable="yes">add a master</property>
+                    <property name="use_underline">True</property>
+                    <property name="stock_id">gtk-add</property>
+                    <signal name="clicked" handler="on_master_added" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToolButton" id="master-delete-button">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="tooltip_text" translatable="yes">remove a master</property>
+                    <property name="label" translatable="yes">remove master</property>
+                    <property name="use_underline">True</property>
+                    <property name="stock_id">gtk-remove</property>
+                    <signal name="clicked" handler="on_master_deleted" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
                 </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>

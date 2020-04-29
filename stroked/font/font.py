@@ -9,6 +9,8 @@ class Font(DefFont):
 
         if path is None:
             self.set_default()
+        else:
+            self.slib = self.lib['space.autre.stroked']
 
     def set_default(self):
         self.info.openTypeHeadCreated = '{:%Y/%m/%d %H:%M:%S}'.format(
@@ -16,16 +18,20 @@ class Font(DefFont):
         self.info.versionMajor = 1
         self.info.versionMinor = 0
         self.info.openTypeNameVersion = 'Version: 1.000'
-        self.lib['gridWidth'] = 5
-        self.lib['gridHeight'] = 7
+        self.slib = {}
+        self.lib['space.autre.stroked'] = self.slib
+        self.slib['gridWidth'] = 5
+        self.slib['gridHeight'] = 7
+        self.slib['masters'] = {}
 
         self._layers.disableNotifications()
         del self._layers['public.default']
-        base_master = self.newLayer('master.regular')
+        base_master = self.add_master(name='Regular')
         self._layers.defaultLayer = base_master
         self._layers.dirty = False
-        self.lib['masters'] = {}
-        self.lib['masters']['regular'] = {
+
+    def add_master(self, name='New Layer'):
+        self.slib['masters'][name] = {
             'weight': 400,
             'width': 100,
             'ascender': 5,
@@ -33,3 +39,13 @@ class Font(DefFont):
             'xHeight': 3,
             'descender': 2,
         }
+        return self.newLayer('master.' + name)
+
+    def delete_master(self, name):
+        master = self._layers['master.' + name]
+        is_default = self._layers.defaultLayer == master
+        del self.slib['masters'][name]
+        del self._layers['master.' + name]
+        if is_default:
+            first_master = self._layers[self._layers.layerOrder[0]]
+            self._layers.defaultLayer = first_master

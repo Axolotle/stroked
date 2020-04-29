@@ -35,33 +35,42 @@ class WindowFontInfo(Gtk.Window):
     openTypeNameDesignerURL = Gtk.Template.Child('designer-url-entry')
     copyright = Gtk.Template.Child('copyright-entry')
     openTypeNameLicense = Gtk.Template.Child('license-entry')
-    versionMajor = Gtk.Template.Child('version-major-spin-button')
-    versionMinor = Gtk.Template.Child('version-minor-spin-button')
+    versionMajor = Gtk.Template.Child('version-major-adj')
+    versionMinor = Gtk.Template.Child('version-minor-adj')
     openTypeHeadCreated = Gtk.Template.Child('date-entry')
 
-    gridWidth = Gtk.Template.Child('grid-width-spin-button')
-    gridHeight = Gtk.Template.Child('grid-height-spin-button')
+    gridWidth = Gtk.Template.Child('grid-width-adj')
+    gridHeight = Gtk.Template.Child('grid-height-adj')
+
+    v_minor_spin_button = Gtk.Template.Child('version-minor-spin-button')
 
     masters_stack = Gtk.Template.Child('masters-stack')
     masters_stack_bar = Gtk.Template.Child('masters-stack-bar')
+
+    master_delete_button = Gtk.Template.Child('master-delete-button')
 
     def __init__(self, window):
         super().__init__(title='Font Info ' + window.filename,
                          transient_for=window)
 
         self.font = window.font
-        self.lib = window.font.lib
+        self.lib = window.font.slib
         self.info = window.font.info
         self.hydrate()
 
         for prop in self.__gtktemplate_widgets__.values():
             widget = getattr(self, prop)
             if 'version' in prop:
+                print('yep')
                 widget.connect('value-changed', self.on_version_edited, prop)
-            else:
+            elif (isinstance(widget, Gtk.Entry)
+                  and not isinstance(widget, Gtk.SpinButton)):
+                widget.connect('activate', self.on_edited, prop)
                 widget.connect('focus-out-event', self.on_edited, prop)
+            elif isinstance(widget, Gtk.Adjustment):
+                widget.connect('value-changed', self.on_edited, prop)
 
-        self.versionMinor.connect('output', self.show_leading_zeros)
+        self.v_minor_spin_button.connect('output', self.show_leading_zeros)
 
     def hydrate(self):
         info = self.info.getDataForSerialization()
@@ -70,15 +79,19 @@ class WindowFontInfo(Gtk.Window):
             for attr_name, value in data.items():
                 if value and hasattr(self, attr_name):
                     widget = getattr(self, attr_name)
-                    if isinstance(widget, Gtk.SpinButton):
-                        widget.get_adjustment().set_value(value)
+                    if isinstance(widget, Gtk.Adjustment):
+                        widget.set_value(value)
                     elif isinstance(widget, (Gtk.Entry, DateEntry)):
                         widget.set_text(value)
 
-        for layer in self.font.layers:
+        for layer in self.font._layers:
             name = layer.name.split('.')[1]
-            stack_item = StackItemMaster(self.lib['masters'][name])
+            layer_info = self.lib['masters'][name]
+            stack_item = StackItemMaster(name, layer_info)
             self.masters_stack.add_titled(stack_item, name, name)
+
+        if len(self.masters_stack.get_children()) <= 1:
+            self.master_delete_button.set_sensitive(False)
 
     def edit_info(self, prop, value):
         if value != getattr(self.info, prop):
@@ -88,9 +101,15 @@ class WindowFontInfo(Gtk.Window):
         if value != self.lib[prop]:
             self.lib[prop] = value
 
-    def on_edited(self, widget, event, prop):
-        if isinstance(widget, Gtk.SpinButton):
-            value = int(widget.get_adjustment().get_value())
+    # ╭─────────────────────╮
+    # │ GTK EVENTS HANDLERS │
+    # ╰─────────────────────╯
+
+    def on_edited(self, widget, event, prop=None):
+        if prop is None:
+            prop = event
+        if isinstance(widget, Gtk.Adjustment):
+            value = int(widget.get_value())
         elif isinstance(widget, Gtk.Entry):
             value = widget.get_text().strip()
             if value == '':
@@ -104,23 +123,51 @@ class WindowFontInfo(Gtk.Window):
             self.edit_lib(prop, value)
 
     def on_version_edited(self, widget, prop):
-        major = int(self.versionMajor.get_adjustment().get_value())
-        minor = int(self.versionMinor.get_adjustment().get_value())
+        major = int(self.versionMajor.get_value())
+        minor = int(self.versionMinor.get_value())
 
         self.edit_info('versionMajor', major)
         self.edit_info('versionMinor', minor)
         self.edit_info('openTypeNameVersion',
                        'Version: {}.{:03d}'.format(major, minor))
 
+    def change_name(self, stack_item, name):
+        old_name = self.masters_stack.child_get_property(stack_item, 'title')
+        self.font._layers['master.' + old_name].name = 'master.' + name
+        self.lib['masters'][name] = self.lib['masters'].pop(old_name)
+        self.masters_stack.child_set_property(stack_item, 'name', name)
+        self.masters_stack.child_set_property(stack_item, 'title', name)
+
     def show_leading_zeros(self, widget):
         value = int(widget.get_adjustment().get_value())
         widget.set_text('{:03d}'.format(value))
         return True
 
+    @Gtk.Template.Callback('on_master_added')
+    def _on_master_added(self, button):
+        master = self.font.add_master()
+        name = master.name.split('.')[1]
+        layer_info = self.font.slib['masters'][name]
+        stack_item = StackItemMaster(name, layer_info)
+        self.masters_stack.add_titled(stack_item, name, name)
+        if len(self.masters_stack.get_children()) > 1:
+            self.master_delete_button.set_sensitive(True)
+
+    @Gtk.Template.Callback('on_master_deleted')
+    def _on_master_deleted(self, button):
+        stack_item = self.masters_stack.get_visible_child()
+        name = self.masters_stack.child_get_property(stack_item, 'title')
+        self.masters_stack.remove(stack_item)
+        self.font.delete_master(name)
+        if len(self.masters_stack.get_children()) <= 1:
+            button.set_sensitive(False)
+
 
 @Gtk.Template.from_resource('/space/autre/stroked/ui/master_stack_item.ui')
 class StackItemMaster(Gtk.Box):
     __gtype_name__ = 'StackItemMaster'
+
+    name_entry = Gtk.Template.Child('name-entry')
 
     weight = Gtk.Template.Child('weight-combo')
     width = Gtk.Template.Child('width-combo')
@@ -130,20 +177,30 @@ class StackItemMaster(Gtk.Box):
     xHeight = Gtk.Template.Child('xHeight-adj')
     descender = Gtk.Template.Child('descender-adj')
 
-    def __init__(self, data):
+    completion = Gtk.Template.Child('name-completion')
+
+    def __init__(self, name, data):
         super().__init__()
 
+        self.name = name
         self.data = data
+
         self.hydrate()
 
         for prop in self.__gtktemplate_widgets__.values():
             widget = getattr(self, prop)
             if isinstance(widget, Gtk.Adjustment):
                 widget.connect('value-changed', self.on_changed, prop)
-            else:
+            elif isinstance(widget, Gtk.ComboBox):
                 widget.connect('changed', self.on_changed, prop)
 
+        self.name_entry.connect('activate', self.on_name_changed)
+        self.name_entry.connect('focus-out-event', self.on_name_changed)
+
+        self.completion.set_match_func(self.match_func)
+
     def hydrate(self):
+        self.name_entry.set_text(self.name)
         for attr_name, value in self.data.items():
             if value and hasattr(self, attr_name):
                 widget = getattr(self, attr_name)
@@ -152,6 +209,10 @@ class StackItemMaster(Gtk.Box):
                 elif isinstance(widget, Gtk.ComboBox):
                     widget.set_active_id(str(value))
 
+    # ╭─────────────────────╮
+    # │ GTK EVENTS HANDLERS │
+    # ╰─────────────────────╯
+
     def on_changed(self, widget, prop):
         if isinstance(widget, Gtk.Adjustment):
             value = int(widget.get_value())
@@ -159,3 +220,12 @@ class StackItemMaster(Gtk.Box):
             value = int(widget.get_active_id())
 
         self.data[prop] = value
+
+    def on_name_changed(self, entry, *args):
+        name = entry.get_text()
+        if name != self.name:
+            self.name = name
+            self.get_toplevel().change_name(self, name)
+
+    def match_func(self, completion, model, iter):
+        return True
