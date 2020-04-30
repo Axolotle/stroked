@@ -18,11 +18,10 @@ class Font(DefFont):
         self.info.versionMajor = 1
         self.info.versionMinor = 0
         self.info.openTypeNameVersion = 'Version: 1.000'
-        self.slib = {}
-        self.lib['space.autre.stroked'] = self.slib
+        self.lib['space.autre.stroked'] = {}
+        self.slib = self.lib['space.autre.stroked']
         self.slib['gridWidth'] = 5
         self.slib['gridHeight'] = 7
-        self.slib['masters'] = {}
 
         self._layers.disableNotifications()
         del self._layers['public.default']
@@ -31,7 +30,8 @@ class Font(DefFont):
         self._layers.dirty = False
 
     def add_master(self, name='New Layer'):
-        self.slib['masters'][name] = {
+        master = self.newLayer('master.' + name)
+        master.lib = {
             'weight': 400,
             'width': 100,
             'ascender': 5,
@@ -39,12 +39,12 @@ class Font(DefFont):
             'xHeight': 3,
             'descender': 2,
         }
-        return self.newLayer('master.' + name)
+        master.trololo = 'trololo'
+        return master
 
     def delete_master(self, name):
         master = self._layers['master.' + name]
         is_default = self._layers.defaultLayer == master
-        del self.slib['masters'][name]
         del self._layers['master.' + name]
         if is_default:
             first_master = self._layers[self._layers.layerOrder[0]]

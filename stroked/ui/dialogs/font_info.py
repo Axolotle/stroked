@@ -61,7 +61,6 @@ class WindowFontInfo(Gtk.Window):
         for prop in self.__gtktemplate_widgets__.values():
             widget = getattr(self, prop)
             if 'version' in prop:
-                print('yep')
                 widget.connect('value-changed', self.on_version_edited, prop)
             elif (isinstance(widget, Gtk.Entry)
                   and not isinstance(widget, Gtk.SpinButton)):
@@ -86,8 +85,7 @@ class WindowFontInfo(Gtk.Window):
 
         for layer in self.font._layers:
             name = layer.name.split('.')[1]
-            layer_info = self.lib['masters'][name]
-            stack_item = StackItemMaster(name, layer_info)
+            stack_item = StackItemMaster(name, layer.lib)
             self.masters_stack.add_titled(stack_item, name, name)
 
         if len(self.masters_stack.get_children()) <= 1:
@@ -134,7 +132,6 @@ class WindowFontInfo(Gtk.Window):
     def change_name(self, stack_item, name):
         old_name = self.masters_stack.child_get_property(stack_item, 'title')
         self.font._layers['master.' + old_name].name = 'master.' + name
-        self.lib['masters'][name] = self.lib['masters'].pop(old_name)
         self.masters_stack.child_set_property(stack_item, 'name', name)
         self.masters_stack.child_set_property(stack_item, 'title', name)
 
@@ -147,8 +144,7 @@ class WindowFontInfo(Gtk.Window):
     def _on_master_added(self, button):
         master = self.font.add_master()
         name = master.name.split('.')[1]
-        layer_info = self.font.slib['masters'][name]
-        stack_item = StackItemMaster(name, layer_info)
+        stack_item = StackItemMaster(name, master.lib)
         self.masters_stack.add_titled(stack_item, name, name)
         if len(self.masters_stack.get_children()) > 1:
             self.master_delete_button.set_sensitive(True)
