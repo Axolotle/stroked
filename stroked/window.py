@@ -1,6 +1,6 @@
 from gi.repository import Gtk, Gdk, Gio
 
-from stroked.ui import dialogs
+from stroked.ui import dialogs, Canvas
 import stroked.settings as stg
 
 
@@ -10,6 +10,8 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
     toolbar = Gtk.Template.Child('toolbar')
     tabs = Gtk.Template.Child('tabs')
+    masters_store = Gtk.Template.Child('masters-store')
+    masters_selection = Gtk.Template.Child('masters-selection')
 
     def __init__(self, app, font, filename='Untitled', font_path=None):
         title = '{} - Stroked'.format(filename)
@@ -27,6 +29,10 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.filename = filename
         self.path = font_path
         self.font.addObserver(self, 'on_font_changed', 'Font.Changed')
+
+        for layer in font._layers:
+            self.masters_store.append([layer.name])
+        self.masters_selection.select_iter(self.masters_store.get_iter_first())
 
     def set_actions(self, app):
         actions = [
@@ -90,6 +96,15 @@ class StrokedWindow(Gtk.ApplicationWindow):
                 stop_propagation = True
 
         return stop_propagation
+
+    @Gtk.Template.Callback('on_layer_select_changed')
+    def _on_layer_select_changed(self, selection):
+        model, treeiter = selection.get_selected()
+        self.font.active_master = model[treeiter][0]
+        active_tab = self.tabs.active_object
+        if isinstance(active_tab, Canvas):
+            active_tab.glyph = self.font.active_master[active_tab.glyph.name]
+            active_tab.queue_draw()
 
     # ╭────────────────────────╮
     # │ DEFCON EVENTS HANDLERS │

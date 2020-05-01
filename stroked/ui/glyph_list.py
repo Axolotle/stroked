@@ -1,4 +1,4 @@
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 
 
 @Gtk.Template.from_resource('/space/autre/stroked/ui/glyph_list.ui')
@@ -7,7 +7,7 @@ class GlyphList(Gtk.FlowBox):
 
     def __init__(self):
         super().__init__()
-        self.populate()
+        self.connect('realize', self.display_glyphs)
 
     @property
     def tabs(self):
@@ -17,9 +17,10 @@ class GlyphList(Gtk.FlowBox):
     def font(self):
         return self.get_toplevel().font
 
-    def populate(self):
-        for glyph in range(32, 127):
-            self.add(GlyphItem(chr(glyph)))
+    def display_glyphs(self, widget):
+        glyph_names = self.font.glyphOrder
+        for name in glyph_names:
+            self.add(GlyphItem(name))
         self.show_all()
 
     # ╭─────────────────────╮
@@ -28,13 +29,12 @@ class GlyphList(Gtk.FlowBox):
 
     @Gtk.Template.Callback('on_glyph_clicked')
     def _on_glyph_clicked(self, glyph_list, glyph_item):
-        font = self.font
+        master = self.font.active_master
         tabs = self.tabs
         label = glyph_item.get_child().get_label()
-        glyph = font.newGlyph(label) if label not in font else font[label]
         tab_num = tabs.find_num_from_tab_label(label)
         if tab_num is None:
-            tab_num = tabs.add_tab(label, glyph)
+            tab_num = tabs.add_tab(label, master[label])
         tabs.set_current_page(tab_num)
 
 
