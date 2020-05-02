@@ -32,6 +32,8 @@ class Canvas(Gtk.DrawingArea):
                      lambda w, e: self._tool.on_mouse_release(w, e))
         self.connect('scroll-event',
                      lambda w, e: self._tool.on_scroll(w, e))
+        self.connect('enter-notify-event', self.on_cursor_changed)
+        self.connect('leave-notify-event', self.on_cursor_changed)
 
         self.connect('size-allocate', self.on_resize)
         self.connect('draw', self.draw)
@@ -40,7 +42,9 @@ class Canvas(Gtk.DrawingArea):
             | Gdk.EventMask.BUTTON_PRESS_MASK
             | Gdk.EventMask.POINTER_MOTION_MASK
             | Gdk.EventMask.BUTTON_RELEASE_MASK
-            | Gdk.EventMask.SCROLL_MASK)
+            | Gdk.EventMask.SCROLL_MASK
+            | Gdk.EventMask.ENTER_NOTIFY_MASK
+            | Gdk.EventMask.LEAVE_NOTIFY_MASK)
 
     @property
     def _tool(self):
@@ -143,6 +147,14 @@ class Canvas(Gtk.DrawingArea):
             'in_path': any(pt in path for path in self.paths)
         }
         self.queue_draw()
+
+    def on_cursor_changed(self, canvas, event):
+        if event.type == Gdk.EventType.ENTER_NOTIFY:
+            name = 'crosshair'
+        else:
+            name = 'default'
+        cursor = Gdk.Cursor.new_from_name(Gdk.Display.get_default(), name)
+        self.get_window().set_cursor(cursor)
 
     def on_delete(self):
         self.paths = []
