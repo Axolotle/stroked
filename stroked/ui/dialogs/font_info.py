@@ -144,8 +144,9 @@ class WindowFontInfo(Gtk.Window):
     def _on_master_added(self, button):
         master = self.font.add_master()
         name = master.name.split('.')[1]
-        stack_item = StackItemMaster(name, master.lib)
+        stack_item = StackItemMaster(name, master.lib['space.autre.stroked'])
         self.masters_stack.add_titled(stack_item, name, name)
+        self.masters_stack.set_visible_child(stack_item)
         if len(self.masters_stack.get_children()) > 1:
             self.master_delete_button.set_sensitive(True)
 

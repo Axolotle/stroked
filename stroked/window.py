@@ -34,6 +34,13 @@ class StrokedWindow(Gtk.ApplicationWindow):
             self.masters_store.append([layer.name])
         self.masters_selection.select_iter(self.masters_store.get_iter_first())
 
+        self.font.layers.addObserver(
+            self, 'on_master_added', 'LayerSet.LayerAdded')
+        self.font.layers.addObserver(
+            self, 'on_master_deleted', 'LayerSet.LayerDeleted')
+        self.font.layers.addObserver(
+            self, 'on_master_renamed', 'LayerSet.LayerNameChanged')
+
     def set_actions(self, app):
         actions = [
             ['font_info', ['<primary>i']],
@@ -97,8 +104,8 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
         return stop_propagation
 
-    @Gtk.Template.Callback('on_layer_select_changed')
-    def _on_layer_select_changed(self, selection):
+    @Gtk.Template.Callback('on_master_select_changed')
+    def _on_master_select_changed(self, selection):
         model, treeiter = selection.get_selected()
         self.font.active_master = model[treeiter][0]
         active_tab = self.tabs.active_object
@@ -116,3 +123,21 @@ class StrokedWindow(Gtk.ApplicationWindow):
         supposed_title = '{}{} - Stroked'.format(dirty, self.filename)
         if title != supposed_title:
             self.set_title(supposed_title)
+
+    def on_master_added(self, notification):
+        master_name = notification.data['name']
+        self.masters_store.append([master_name])
+
+    def on_master_deleted(self, notification):
+        master_name = notification.data['name']
+        for row in self.masters_store:
+            if row[0] == master_name:
+                self.masters_store.remove(row.iter)
+
+    def on_master_renamed(self, notification):
+        data = notification.data
+        old_name = data["oldName"]
+        new_name = data["newName"]
+        for row in self.masters_store:
+            if row[0] == old_name:
+                row[0] = new_name

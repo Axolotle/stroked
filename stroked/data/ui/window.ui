@@ -404,7 +404,7 @@
                                 <property name="headers_visible">False</property>
                                 <child internal-child="selection">
                                   <object class="GtkTreeSelection" id="masters-selection">
-                                    <signal name="changed" handler="on_layer_select_changed" swapped="no"/>
+                                    <signal name="changed" handler="on_master_select_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
