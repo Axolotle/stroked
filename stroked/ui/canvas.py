@@ -24,8 +24,6 @@ class Canvas(Gtk.DrawingArea):
         self.drag = (0, 0)
         self.mouse_pos = None
 
-        self.hover = None
-
         self.connect('button-press-event',
                      lambda w, e: self._tool.on_mouse_press(w, e))
         self.connect('motion-notify-event',
@@ -87,9 +85,6 @@ class Canvas(Gtk.DrawingArea):
         if self.mouse_pos:
             self._tool.draw_cursor(ctx, self)
 
-        if self.hover is not None:
-            self.draw_selector(ctx, margin)
-
     def draw_grid(self, ctx, size, margin):
         ctx.set_source_rgb(0.13, 0.3, 0.89)
         for x in range(size[0]):
@@ -108,26 +103,6 @@ class Canvas(Gtk.DrawingArea):
             ctx.move_to(-1, y + 0.5)
             ctx.line_to(size[0] + 1, y + 0.5)
         ctx.stroke()
-
-    def draw_selector(self, ctx, margin):
-        color = (1, 0, 106/255) if self.hover['in_path'] else (0.13, 0.3, 0.89)
-        ctx.set_source_rgb(*color)
-        ctx.set_line_width(self.scale * 2 / self.zoom)
-        x, y = self.hover['point']
-        ctx.arc(x + margin[0],
-                y + margin[1],
-                self.scale * 6 / self.zoom,
-                0.0,
-                2 * pi)
-        ctx.stroke()
-        if self.hover['in_path']:
-            ctx.new_path()
-            ctx.arc(x + margin[0],
-                    y + margin[1],
-                    self.scale * 2 / self.zoom,
-                    0.0,
-                    2 * pi)
-            ctx.fill()
 
     def screen_to_point(self, x, y):
         grid = stg.get('grid')
@@ -149,13 +124,6 @@ class Canvas(Gtk.DrawingArea):
         self.origin = (rect.width / 2, rect.height / 2)
         grid = stg.get('grid')
         self.scale = (grid['size'][1] + grid['margin'][0]) / rect.height
-
-    def on_hover(self, pt):
-        self.hover = {
-            'point': pt,
-            'in_path': any(pt in path for path in self.paths)
-        }
-        self.queue_draw()
 
     def on_cursor_changed(self, canvas, event):
         if event.type == Gdk.EventType.ENTER_NOTIFY:
