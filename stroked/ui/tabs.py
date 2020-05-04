@@ -1,4 +1,4 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject
 
 from stroked.ui import Canvas
 
@@ -7,16 +7,20 @@ from stroked.ui import Canvas
 class Tabs(Gtk.Notebook):
     __gtype_name__ = 'Tabs'
 
+    __gsignals__ = {
+        'current_glyph_changed': (
+            GObject.SIGNAL_RUN_FIRST, None, (object, str))
+    }
+
     def __init__(self):
         super().__init__()
-        self.current_tool = None
 
     @property
-    def active_object(self):
+    def active_tab(self):
         return self.get_nth_page(self.get_current_page())
 
-    def add_tab(self, title, glyph):
-        canvas = Canvas(glyph)
+    def add_tab(self, title):
+        canvas = Canvas()
         box = Gtk.HBox(spacing=10)
         close_button = Gtk.Button.new_from_icon_name(
             'gtk-close', Gtk.IconSize.MENU)
@@ -44,18 +48,18 @@ class Tabs(Gtk.Notebook):
         if num > 0:
             self.get_nth_page(num).queue_draw()
 
-    def find_num_from_tab_object(self, tab):
+    def find_num_from_tab_object(self, tab_object):
         for num in range(1, self.get_n_pages()):
-            page = self.get_nth_page(num)
-            if page == tab:
+            tab = self.get_nth_page(num)
+            if tab == tab_object:
                 return num
         return None
 
     def find_num_from_tab_label(self, label):
         for num in range(1, self.get_n_pages()):
-            page = self.get_nth_page(num)
-            page_label = self.get_tab_label(page).get_children()[0].get_label()
-            if label == page_label:
+            tab = self.get_nth_page(num)
+            tab_label = self.get_tab_label(tab).get_children()[0].get_label()
+            if label == tab_label:
                 return num
         return None
 
@@ -71,14 +75,5 @@ class Tabs(Gtk.Notebook):
     @Gtk.Template.Callback('on_page_switched')
     def _on_page_switched(self, tabs, tab, num):
         if num > 0:
-            self.current_tool.set_canvas(tab)
-
-    # ╭────────────╮
-    # │ GTK NOTIFY │
-    # ╰────────────╯
-
-    def on_tool_changed(self, toolbar, param):
-        self.current_tool = toolbar.get_property(param.name)
-        canvas = self.active_object
-        if isinstance(canvas, Canvas):
-            self.current_tool.set_canvas(canvas)
+            glyph_name = self.get_tab_label(tab).get_children()[0].get_label()
+            self.emit('current_glyph_changed', tab, glyph_name)

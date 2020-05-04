@@ -60,26 +60,9 @@ class BaseTool():
     # │ DRAW METHODS │
     # ╰──────────────╯
 
-    def draw_cursor(self, ctx, mouse_pos, color=(0.13, 0.3, 0.89)):
-        scale, zoom = self.canvas.scale, self.canvas.zoom
+    def draw_cursor(self, ctx, canvas, color=(0.13, 0.3, 0.89)):
+        pos, scale, zoom = canvas.mouse_pos, canvas.scale, canvas.zoom
         ctx.set_source_rgb(*color)
         ctx.set_line_width(scale * 2 / zoom)
-        ctx.arc(mouse_pos[0], mouse_pos[1], scale * 6 / zoom, 0.0, 2 * pi)
+        ctx.arc(pos[0], pos[1], scale * 6 / zoom, 0.0, 2 * pi)
         ctx.stroke()
-
-    # ╭──────────────╮
-    # │ TOOL HELPERS │
-    # ╰──────────────╯
-
-    def get_point_in_glyph(self, pt):
-        for contour in self.canvas.glyph:
-            for point in contour:
-                if pt[0] == point.x and pt[1] == point.y:
-                    return point
-        return None
-
-    def get_point_in_contour(self, contour, pt):
-        for point in contour:
-            if pt[0] == point.x and pt[1] == point.y:
-                return point
-        return None

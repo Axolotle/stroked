@@ -1,6 +1,7 @@
 from gi.repository import Gdk
 
 from .base_tool import BaseTool
+from .helpers import get_point_in_glyph
 
 
 class SelectTool(BaseTool):
@@ -16,7 +17,7 @@ class SelectTool(BaseTool):
     def on_mouse_press(self, canvas, event):
         super().on_mouse_press(canvas, event)
         if event.button == Gdk.BUTTON_PRIMARY:
-            pt = self.get_point_in_glyph(canvas.mouse_pos)
+            pt = get_point_in_glyph(canvas.mouse_pos, canvas.glyph)
             if pt is not None:
                 if event.state & Gdk.ModifierType.SHIFT_MASK:
                     if pt in self.selected:
@@ -58,7 +59,7 @@ class SelectTool(BaseTool):
     # │ DRAW METHODS │
     # ╰──────────────╯
 
-    def draw_cursor(self, ctx, mouse_pos):
-        pt = self.get_point_in_glyph(mouse_pos)
+    def draw_cursor(self, ctx, canvas):
+        pt = get_point_in_glyph(canvas.mouse_pos, canvas.glyph)
         color = (1, 0, 106/255) if pt is not None else (0.13, 0.3, 0.89)
-        super().draw_cursor(ctx, mouse_pos, color=color)
+        super().draw_cursor(ctx, canvas, color=color)

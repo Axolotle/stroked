@@ -17,7 +17,7 @@ class PenTool(BaseTool):
         if event.button == Gdk.BUTTON_PRIMARY:
             self.add_point(canvas.glyph, canvas.mouse_pos)
         elif event.button == Gdk.BUTTON_SECONDARY:
-            self.stop_drawing()
+            self.stop_drawing(canvas)
 
     def on_mouse_move(self, canvas, event):
         super().on_mouse_move(canvas, event)
@@ -47,7 +47,7 @@ class PenTool(BaseTool):
         point = glyph[-1][-1]
         point.x, point.y = pt
 
-    def stop_drawing(self):
-        contour = self.canvas.glyph[-1]
+    def stop_drawing(self, canvas):
+        contour = canvas.glyph[-1]
         contour.removePoint(contour[-1])
         self.is_drawing = False

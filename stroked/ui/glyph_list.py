@@ -11,7 +11,7 @@ class GlyphList(Gtk.FlowBox):
 
     @property
     def tabs(self):
-        return self.get_toplevel().tabs
+        return self.get_parent().get_parent().get_parent()
 
     @property
     def font(self):
@@ -29,12 +29,11 @@ class GlyphList(Gtk.FlowBox):
 
     @Gtk.Template.Callback('on_glyph_clicked')
     def _on_glyph_clicked(self, glyph_list, glyph_item):
-        master = self.font.active_master
         tabs = self.tabs
         label = glyph_item.get_child().get_label()
         tab_num = tabs.find_num_from_tab_label(label)
         if tab_num is None:
-            tab_num = tabs.add_tab(label, master[label])
+            tab_num = tabs.add_tab(label)
         tabs.set_current_page(tab_num)
 
 

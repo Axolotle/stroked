@@ -1,3 +1,4 @@
+import weakref
 from math import pi
 
 from gi.repository import Gtk, Gdk
@@ -10,10 +11,11 @@ from stroked.pens import CairoPen
 class Canvas(Gtk.DrawingArea):
     __gtype_name__ = 'Canvas'
 
-    def __init__(self, glyph):
+    def __init__(self):
         super().__init__()
 
-        self.glyph = glyph
+        self._glyph = None
+        self._tool = None
 
         self.scale = 0.01
         self.zoom = 1
@@ -47,8 +49,15 @@ class Canvas(Gtk.DrawingArea):
             | Gdk.EventMask.LEAVE_NOTIFY_MASK)
 
     @property
-    def _tool(self):
-        return self.get_parent().current_tool
+    def glyph(self):
+        if self._glyph is not None:
+            return self._glyph()
+        return None
+
+    @glyph.setter
+    def glyph(self, glyph):
+        self._glyph = weakref.ref(glyph)
+        self.queue_draw()
 
     def draw(self, widget, ctx):
         grid = stg.get('grid')
@@ -76,7 +85,7 @@ class Canvas(Gtk.DrawingArea):
         ctx.translate(margin[0], margin[1])
         self.glyph.draw(CairoPen(ctx))
         if self.mouse_pos:
-            self._tool.draw_cursor(ctx, self.mouse_pos)
+            self._tool.draw_cursor(ctx, self)
 
         if self.hover is not None:
             self.draw_selector(ctx, margin)

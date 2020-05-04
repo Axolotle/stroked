@@ -23,17 +23,20 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
         self.set_actions(app)
 
-        self.toolbar.connect('notify::current-tool', self.tabs.on_tool_changed)
+        self.tabs.connect(
+            'current_glyph_changed', self.on_current_glyph_changed)
+        self.toolbar.connect(
+            'current_tool_changed', self.on_current_tool_changed)
 
         self.font = font
         self.filename = filename
         self.path = font_path
-        self.font.addObserver(self, 'on_font_changed', 'Font.Changed')
 
         for layer in font._layers:
             self.masters_store.append([layer.name])
         self.masters_selection.select_iter(self.masters_store.get_iter_first())
 
+        self.font.addObserver(self, 'on_font_changed', 'Font.Changed')
         self.font.layers.addObserver(
             self, 'on_master_added', 'LayerSet.LayerAdded')
         self.font.layers.addObserver(
@@ -108,10 +111,17 @@ class StrokedWindow(Gtk.ApplicationWindow):
     def _on_master_select_changed(self, selection):
         model, treeiter = selection.get_selected()
         self.font.active_master = model[treeiter][0]
-        active_tab = self.tabs.active_object
+        active_tab = self.tabs.active_tab
         if isinstance(active_tab, Canvas):
             active_tab.glyph = self.font.active_master[active_tab.glyph.name]
-            active_tab.queue_draw()
+
+    def on_current_glyph_changed(self, tabs, canvas, glyph_name):
+        canvas._tool = self.toolbar.current_tool
+        canvas.glyph = self.font.active_master[glyph_name]
+
+    def on_current_tool_changed(self, widget, tool):
+        current_canvas = self.tabs.active_tab
+        current_canvas._tool = tool
 
     # ╭────────────────────────╮
     # │ DEFCON EVENTS HANDLERS │
