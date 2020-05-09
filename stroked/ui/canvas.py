@@ -21,6 +21,7 @@ class Canvas(Gtk.DrawingArea):
         self.size = (0, 0)
         self.offset = (0, 0)
         self.drag_origin = (0, 0)
+        # position of the mouse in pt
         self.mouse_pos = (0, 0)
 
         self.connect('button-press-event', self.on_mouse_press)
@@ -107,7 +108,7 @@ class Canvas(Gtk.DrawingArea):
     # │ COORDINATES HELPERS │
     # ╰─────────────────────╯
 
-    def screen_to_point(self, x, y):
+    def pixel_to_point(self, x, y):
         offx, offy = self.offset
         scale = self.scale
 
@@ -144,7 +145,7 @@ class Canvas(Gtk.DrawingArea):
         self.queue_draw()
 
     def on_mouse_move(self, canvas, event):
-        self.mouse_pos = self.screen_to_point(event.x, event.y)
+        self.mouse_pos = self.pixel_to_point(event.x, event.y)
         if event.state & Gdk.ModifierType.BUTTON2_MASK:
             self.update_drag_translation(event.x, event.y)
             self.drag_origin = (event.x, event.y)

@@ -74,6 +74,9 @@ class Tabs(Gtk.Notebook):
 
     @Gtk.Template.Callback('on_page_switched')
     def _on_page_switched(self, tabs, tab, num):
+        prev_tab = self.active_tab
+        if isinstance(prev_tab, Canvas):
+            prev_tab._tool.reset(prev_tab)
         if num > 0:
             glyph_name = self.get_tab_label(tab).get_children()[0].get_label()
             self.emit('current_glyph_changed', tab, glyph_name)

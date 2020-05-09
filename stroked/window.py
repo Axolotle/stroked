@@ -113,6 +113,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.font.active_master = model[treeiter][0]
         active_tab = self.tabs.active_tab
         if isinstance(active_tab, Canvas):
+            active_tab._tool.reset(active_tab)
             active_tab.glyph = self.font.active_master[active_tab.glyph.name]
 
     def on_current_glyph_changed(self, tabs, canvas, glyph_name):
@@ -121,6 +122,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
 
     def on_current_tool_changed(self, widget, tool):
         current_canvas = self.tabs.active_tab
+        current_canvas._tool.reset(current_canvas)
         current_canvas._tool = tool
 
     # ╭────────────────────────╮
