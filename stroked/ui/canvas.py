@@ -68,13 +68,14 @@ class Canvas(Gtk.DrawingArea):
                 layer_lib['xHeight'], 0, layer_lib['descender']
             ]
         ]
-
         ctx.set_source_rgba(0.1, 0.1, 0.1, 1.0)
         ctx.paint()
         # translate the grid zone in the canvas
         ctx.translate(*self.offset)
         # set the pt to px scale to draw directly with pt values
         ctx.scale(self.scale, self.scale)
+        # avoid linejoin and linecap problems
+        ctx.set_tolerance(1)
 
         self.draw_guides(ctx, guides_x, guides_y)
         self.draw_grid(ctx, grid)
