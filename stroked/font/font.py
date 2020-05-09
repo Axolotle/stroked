@@ -29,6 +29,10 @@ class Font(DefFont):
     def active_master(self, name):
         self._active_master_name = name
 
+    @property
+    def grid(self):
+        return (self.slib['gridWidth'], self.slib['gridHeight'])
+
     def set_default(self):
         self.info.openTypeHeadCreated = '{:%Y/%m/%d %H:%M:%S}'.format(
             date.today())
@@ -64,7 +68,7 @@ class Font(DefFont):
             'ascender': 5,
             'capHeight': 5,
             'xHeight': 3,
-            'descender': 2,
+            'descender': -2,
         }
 
         glyph_names = self.glyphOrder
