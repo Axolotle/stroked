@@ -15,9 +15,8 @@ class SelectTool(BaseTool):
     # ╰─────────────────────╯
 
     def on_mouse_press(self, canvas, event):
-        super().on_mouse_press(canvas, event)
         if event.button == Gdk.BUTTON_PRIMARY:
-            pt = get_point_in_glyph(canvas.mouse_pos, canvas.glyph)
+            pt = get_point_in_glyph(canvas.glyph, canvas.mouse_pos)
             if pt is not None:
                 if event.state & Gdk.ModifierType.SHIFT_MASK:
                     if pt in self.selected:
@@ -31,21 +30,14 @@ class SelectTool(BaseTool):
                 self.selected = []
 
     def on_mouse_move(self, canvas, event):
-        super().on_mouse_move(canvas, event)
         if event.state & Gdk.ModifierType.BUTTON1_MASK:
-            mouse_pos = canvas.mouse_pos
-
-            if len(self.selected):
+            if len(self.selected) and self.drag != canvas.mouse_pos:
+                mx, my = canvas.mouse_pos
+                dx, dy = self.drag
+                translate = (mx - dx, my - dy)
                 for pt in self.selected:
-                    if self.drag != mouse_pos:
-                        pt.move((mouse_pos[0] - self.drag[0],
-                                 mouse_pos[1] - self.drag[1]))
-                self.drag = mouse_pos
-
-    def on_mouse_release(self, canvas, event):
-        super().on_mouse_release(canvas, event)
-        if event.button == Gdk.BUTTON_PRIMARY:
-            self.drag = (0, 0)
+                    pt.move(translate)
+                self.drag = canvas.mouse_pos
 
     # ╭──────────────╮
     # │ TOOL METHODS │
@@ -60,6 +52,6 @@ class SelectTool(BaseTool):
     # ╰──────────────╯
 
     def draw_cursor(self, ctx, canvas):
-        pt = get_point_in_glyph(canvas.mouse_pos, canvas.glyph)
+        pt = get_point_in_glyph(canvas.glyph, canvas.mouse_pos)
         color = (1, 0, 106/255) if pt is not None else (0.13, 0.3, 0.89)
         super().draw_cursor(ctx, canvas, color=color)

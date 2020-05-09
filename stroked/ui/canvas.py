@@ -17,21 +17,16 @@ class Canvas(Gtk.DrawingArea):
         self._glyph = None
         self._tool = None
 
-        self.scale = 0.01
-        self.zoom = 1
+        self.scale = 1.0
+        self.size = (0, 0)
+        self.offset = (0, 0)
+        self.drag_origin = (0, 0)
+        self.mouse_pos = (0, 0)
 
-        self.origin = (0, 0)
-        self.drag = (0, 0)
-        self.mouse_pos = None
-
-        self.connect('button-press-event',
-                     lambda w, e: self._tool.on_mouse_press(w, e))
-        self.connect('motion-notify-event',
-                     lambda w, e: self._tool.on_mouse_move(w, e))
-        self.connect('button-release-event',
-                     lambda w, e: self._tool.on_mouse_release(w, e))
-        self.connect('scroll-event',
-                     lambda w, e: self._tool.on_scroll(w, e))
+        self.connect('button-press-event', self.on_mouse_press)
+        self.connect('motion-notify-event', self.on_mouse_move)
+        self.connect('button-release-event', self.on_mouse_release)
+        self.connect('scroll-event', self.on_scroll)
         self.connect('enter-notify-event', self.on_cursor_changed)
         self.connect('leave-notify-event', self.on_cursor_changed)
 
@@ -58,72 +53,147 @@ class Canvas(Gtk.DrawingArea):
         self.queue_draw()
 
     def draw(self, widget, ctx):
-        grid = stg.get('grid')
-        size = grid['size']
-        margin = grid['margin']
-        full_size = (size[0] + margin[0], size[1] + margin[1])
+        glyph = self.glyph
+        layer_lib = self.glyph.layer.lib['space.autre.stroked']
+        font = glyph.font
 
-        ctx.set_source_rgba(0.1, 0.1, 0.1, 1)
+        grid = font.grid
+
+        glyph_origin = grid[1] + layer_lib['descender']
+        guides_x = (-0.5, grid[0] - 0.5)
+        guides_y = [
+            glyph_origin - pos - 0.5 for pos in [
+                layer_lib['ascender'], layer_lib['capHeight'],
+                layer_lib['xHeight'], 0, layer_lib['descender']
+            ]
+        ]
+
+        ctx.set_source_rgba(0.1, 0.1, 0.1, 1.0)
         ctx.paint()
+        # translate the grid zone in the canvas
+        ctx.translate(*self.offset)
+        # set the pt to px scale to draw directly with pt values
+        ctx.scale(self.scale, self.scale)
 
-        ori = self.origin
-        ctx.translate(ori[0] - (full_size[0] / 2 / self.scale * self.zoom),
-                      ori[1] - (full_size[1] / 2 / self.scale * self.zoom))
-        ctx.scale(1 / self.scale * self.zoom, 1 / self.scale * self.zoom)
+        self.draw_guides(ctx, guides_x, guides_y)
+        self.draw_grid(ctx, grid)
 
-        self.draw_guides(ctx, full_size)
-        self.draw_grid(ctx, size, margin)
-
-        ctx.set_source_rgba(1, 1, 1, 1)
+        ctx.set_source_rgba(1.0, 1.0, 1.0, 1.0)
         linestyle = stg.get('linestyle')
         ctx.set_line_width(linestyle['linewidth'])
         ctx.set_line_cap(linestyle['linecap'])
         ctx.set_line_join(linestyle['linejoin'])
 
-        ctx.translate(margin[0], margin[1])
         self.glyph.draw(CairoPen(ctx))
         if self.mouse_pos:
             self._tool.draw_cursor(ctx, self)
 
-    def draw_grid(self, ctx, size, margin):
+    def draw_grid(self, ctx, size):
         ctx.set_source_rgb(0.13, 0.3, 0.89)
         for x in range(size[0]):
             for y in range(size[1]):
-                ctx.arc(x + margin[0],
-                        y + margin[1],
-                        self.scale * 2 / self.zoom,
-                        0.0,
-                        2 * pi)
+                ctx.arc(x, y, 2 / self.scale, 0.0, 2 * pi)
                 ctx.fill()
 
-    def draw_guides(self, ctx, size):
+    def draw_guides(self, ctx, guides_x, guides_y):
         ctx.set_source_rgb(1, 0, 106/255)
-        ctx.set_line_width(self.scale / self.zoom)
-        for y in stg.get('guides').values():
-            ctx.move_to(-1, y + 0.5)
-            ctx.line_to(size[0] + 1, y + 0.5)
-        ctx.stroke()
-
-    def screen_to_point(self, x, y):
-        grid = stg.get('grid')
-        margin = grid['margin']
-        full_size = (grid['size'][0] + margin[0], grid['size'][1] + margin[1])
-        ori = self.origin
-        translate = (ori[0] - (full_size[0] / 2 / self.scale * self.zoom),
-                     ori[1] - (full_size[1] / 2 / self.scale * self.zoom))
-        return (
-            round((x-translate[0]) * self.scale / self.zoom) - margin[0],
-            round((y-translate[1]) * self.scale / self.zoom) - margin[1]
-        )
+        ctx.set_line_width(1 / self.scale)  # 1px
+        for y in guides_y:
+            ctx.move_to(guides_x[0], y)
+            ctx.line_to(guides_x[1], y)
+            ctx.stroke()
 
     # ╭─────────────────────╮
-    # │ GTK EVENTS HANDLERS │
+    # │ COORDINATES HELPERS │
     # ╰─────────────────────╯
 
+    def screen_to_point(self, x, y):
+        offx, offy = self.offset
+        scale = self.scale
+
+        return (round((x - offx) / scale),
+                round((y - offy) / scale))
+
+    def update_drag_translation(self, x, y):
+        dox, doy = self.drag_origin
+        dx, dy = x - dox, y - doy
+
+        offx, offy = self.offset
+        self.offset = (offx + dx, offy + dy)
+
+    def fit_grid_to_screen(self):
+        size = self.get_allocated_size()[0]
+        w, h = (size.width, size.height)
+        grid_w, grid_h = self.glyph.font.grid
+
+        scale = h / (grid_h + 1)
+        grid_w, grid_h = ((grid_w - 1) * scale, (grid_h - 1) * scale)
+
+        self.offset = ((w - grid_w) * 0.5, (h - grid_h) * 0.5)
+        self.scale = scale
+        self.size = (w, h)
+
+    # ╭───────────────────────────╮
+    # │ GTK INPUT EVENTS HANDLERS │
+    # ╰───────────────────────────╯
+
+    def on_mouse_press(self, canvas, event):
+        if event.button == Gdk.BUTTON_MIDDLE:
+            self.drag_origin = (event.x, event.y)
+        self._tool.on_mouse_press(self, event)
+        self.queue_draw()
+
+    def on_mouse_move(self, canvas, event):
+        self.mouse_pos = self.screen_to_point(event.x, event.y)
+        if event.state & Gdk.ModifierType.BUTTON2_MASK:
+            self.update_drag_translation(event.x, event.y)
+            self.drag_origin = (event.x, event.y)
+        self._tool.on_mouse_move(self, event)
+        self.queue_draw()
+
+    def on_mouse_release(self, canvas, event):
+        if event.button == Gdk.BUTTON_MIDDLE:
+            self.update_drag_translation(event.x, event.y)
+            canvas.drag_origin = (0, 0)
+            canvas.queue_draw()
+
+    def on_scroll(self, canvas, event):
+        prev_scale = self.scale
+
+        if event.direction == Gdk.ScrollDirection.UP:
+            self.scale *= 1.1
+        else:
+            self.scale *= pow(1.1, -1)
+        if canvas.scale <= 0:
+            self.scale = 0.01
+
+        offx, offy = self.offset
+        diff = self.scale - prev_scale
+
+        dx = (event.x - offx) / prev_scale * diff
+        dy = (event.y - offy) / prev_scale * diff
+
+        self.offset = (offx - dx, offy - dy)
+
+        canvas.queue_draw()
+
     def on_resize(self, widget, rect):
-        self.origin = (rect.width / 2, rect.height / 2)
-        grid = stg.get('grid')
-        self.scale = (grid['size'][1] + grid['margin'][0]) / rect.height
+        if self.size == (0, 0):
+            self.fit_grid_to_screen()
+            return
+
+        old_w, old_h = self.size
+        w, h = (rect.width, rect.height)
+        offx, offy = self.offset
+
+        dx, dy = (0.5 * (old_w - w), 0.5 * (old_h - h))
+
+        self.offset = (offx - dx, offy - dy)
+        self.size = (w, h)
+
+    # ╭───────────────────────────╮
+    # │ GTK OTHER EVENTS HANDLERS │
+    # ╰───────────────────────────╯
 
     def on_cursor_changed(self, canvas, event):
         if event.type == Gdk.EventType.ENTER_NOTIFY:
@@ -132,7 +202,3 @@ class Canvas(Gtk.DrawingArea):
             name = 'default'
         cursor = Gdk.Cursor.new_from_name(Gdk.Display.get_default(), name)
         self.get_window().set_cursor(cursor)
-
-    def on_delete(self):
-        self.paths = []
-        self.stop_drawing()

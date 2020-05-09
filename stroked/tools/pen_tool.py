@@ -13,14 +13,12 @@ class PenTool(BaseTool):
     # ╰─────────────────────╯
 
     def on_mouse_press(self, canvas, event):
-        super().on_mouse_press(canvas, event)
         if event.button == Gdk.BUTTON_PRIMARY:
             self.add_point(canvas.glyph, canvas.mouse_pos)
         elif event.button == Gdk.BUTTON_SECONDARY:
             self.stop_drawing(canvas)
 
     def on_mouse_move(self, canvas, event):
-        super().on_mouse_move(canvas, event)
         if self.is_drawing:
             self.update_last_point(canvas.glyph, canvas.mouse_pos)
 
@@ -29,8 +27,7 @@ class PenTool(BaseTool):
     # ╰──────────────╯
 
     def reset(self):
-        if self.is_drawing:
-            self.stop_drawing()
+        self.is_drawing = False
 
     def add_point(self, glyph, pt):
         if not self.is_drawing:
