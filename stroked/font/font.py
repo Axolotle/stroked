@@ -3,11 +3,17 @@ from datetime import date
 from defcon import Font as DefFont
 
 from stroked.font.layer_set import LayerSet
+from stroked.font.glyph import Glyph
+from stroked.font.contour import Contour
+from stroked.font.point import Point
 
 
 class Font(DefFont):
     def __init__(self, path=None):
-        super().__init__(path=path, layerSetClass=LayerSet)
+        super().__init__(
+            path=path,
+            layerSetClass=LayerSet,
+            glyphClass=Glyph, glyphContourClass=Contour, glyphPointClass=Point)
 
         if path is None:
             self.set_default()
