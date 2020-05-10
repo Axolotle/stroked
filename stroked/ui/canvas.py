@@ -74,8 +74,6 @@ class Canvas(Gtk.DrawingArea):
         ctx.translate(*self.offset)
         # set the pt to px scale to draw directly with pt values
         ctx.scale(self.scale, self.scale)
-        # avoid linejoin and linecap problems
-        ctx.set_tolerance(1)
 
         self.draw_guides(ctx, guides_x, guides_y)
         self.draw_grid(ctx, grid)
@@ -86,7 +84,13 @@ class Canvas(Gtk.DrawingArea):
         ctx.set_line_cap(linestyle['linecap'])
         ctx.set_line_join(linestyle['linejoin'])
 
-        self.glyph.draw(CairoPen(ctx))
+        # avoid linejoin and linecap problems
+        ctx.set_tolerance(1)
+        glyph.draw(CairoPen(ctx))
+
+        ctx.set_tolerance(0.1)
+        self.draw_points(ctx, glyph)
+
         if self.mouse_pos:
             self._tool.draw_cursor(ctx, self)
 
@@ -104,6 +108,22 @@ class Canvas(Gtk.DrawingArea):
             ctx.move_to(guides_x[0], y)
             ctx.line_to(guides_x[1], y)
             ctx.stroke()
+
+    def draw_points(self, ctx, glyph):
+        selection = glyph.selection
+        r = 5 / self.scale
+        pi2 = 2 * pi
+        for contour in glyph:
+            ctx.set_source_rgb(0, 1, 0)
+            for point in contour:
+                if point in selection:
+                    continue
+                ctx.arc(point.x, point.y, r, 0.0, pi2)
+                ctx.fill()
+        ctx.set_source_rgb(1, 0, 106/255)
+        for point in selection:
+            ctx.arc(point.x, point.y, r, 0.0, pi2)
+            ctx.fill()
 
     # ╭─────────────────────╮
     # │ COORDINATES HELPERS │
