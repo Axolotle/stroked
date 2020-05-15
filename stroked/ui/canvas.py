@@ -93,6 +93,7 @@ class Canvas(Gtk.DrawingArea):
 
         if self.mouse_pos:
             self._tool.draw_cursor(ctx, self)
+        self._tool.draw_specific(ctx, self)
 
     def draw_grid(self, ctx, size):
         ctx.set_source_rgb(0.13, 0.3, 0.89)
@@ -111,10 +112,11 @@ class Canvas(Gtk.DrawingArea):
 
     def draw_points(self, ctx, glyph):
         selection = glyph.selection
-        r = 5 / self.scale
+        r = 2 / self.scale
+        r_selected = 5 / self.scale
         pi2 = 2 * pi
         for contour in glyph:
-            ctx.set_source_rgb(0, 1, 0)
+            ctx.set_source_rgb(0, 0, 0)
             for point in contour:
                 if point in selection:
                     continue
@@ -122,7 +124,7 @@ class Canvas(Gtk.DrawingArea):
                 ctx.fill()
         ctx.set_source_rgb(1, 0, 106/255)
         for point in selection:
-            ctx.arc(point.x, point.y, r, 0.0, pi2)
+            ctx.arc(point.x, point.y, r_selected, 0.0, pi2)
             ctx.fill()
 
     # ╭─────────────────────╮
@@ -133,8 +135,8 @@ class Canvas(Gtk.DrawingArea):
         offx, offy = self.offset
         scale = self.scale
 
-        return (round((x - offx) / scale),
-                round((y - offy) / scale))
+        return ((x - offx) / scale,
+                (y - offy) / scale)
 
     def update_drag_translation(self, x, y):
         dox, doy = self.drag_origin
@@ -178,6 +180,8 @@ class Canvas(Gtk.DrawingArea):
             self.update_drag_translation(event.x, event.y)
             canvas.drag_origin = (0, 0)
             canvas.queue_draw()
+        self._tool.on_mouse_release(self, event)
+        self.queue_draw()
 
     def on_scroll(self, canvas, event):
         prev_scale = self.scale

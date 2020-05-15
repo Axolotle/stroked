@@ -1,6 +1,3 @@
-from math import pi
-
-from gi.repository import Gdk
 
 
 class BaseTool():
@@ -30,9 +27,7 @@ class BaseTool():
     # ╰──────────────╯
 
     def draw_cursor(self, ctx, canvas, color=(0.13, 0.3, 0.89)):
-        mx, my = canvas.mouse_pos
-        scale = canvas.scale
-        ctx.set_source_rgb(*color)
-        ctx.set_line_width(2 / scale)
-        ctx.arc(mx, my, 10 / scale, 0.0, 2 * pi)
-        ctx.stroke()
+        pass
+
+    def draw_specific(self, ctx, canvas):
+        pass

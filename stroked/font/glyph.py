@@ -27,4 +27,4 @@ class Glyph(DefGlyph):
     @selection.setter
     def selection(self, selection):
         for contour in self:
-            contour.selected = contour in selection
+            contour.selection = selection
