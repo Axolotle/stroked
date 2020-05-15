@@ -15,6 +15,9 @@ class BaseTool():
     def on_mouse_release(self, canvas, event):
         pass
 
+    def on_key_press(self, canvas, event):
+        pass
+
     # ╭──────────────╮
     # │ TOOL METHODS │
     # ╰──────────────╯

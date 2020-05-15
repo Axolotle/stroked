@@ -58,9 +58,8 @@ class SelectTool(BaseTool):
             else:
                 x, y = round_point(canvas.mouse_pos)
                 dx, dy = round_point(self.drag_origin)
-                translate = (x - dx, y - dy)
-                for point in self.selection:
-                    point.move(translate)
+                translation = (x - dx, y - dy)
+                self.move_selection(self.selection, translation)
                 self.drag_origin = (x, y)
                 canvas.glyph.selection = self.selection
 
@@ -78,6 +77,17 @@ class SelectTool(BaseTool):
         glyph.selection = selection
         self.select_rect = None
         self.selection = None
+
+    def on_key_press(self, canvas, event):
+        translations = {
+            'Up': (0, -1),
+            'Down': (0, 1),
+            'Left': (-1, 0),
+            'Right': (1, 0)
+        }
+        key = Gdk.keyval_name(event.keyval)
+        if key in translations:
+            self.move_selection(canvas.glyph.selection, translations[key])
 
     # ╭──────────────╮
     # │ TOOL METHODS │
@@ -102,6 +112,10 @@ class SelectTool(BaseTool):
                     points.add(point)
         return points
 
+    def move_selection(self, selection, translation):
+        for point in selection:
+            point.move(translation)
+
     # ╭──────────────╮
     # │ DRAW METHODS │
     # ╰──────────────╯
@@ -122,7 +136,8 @@ class SelectTool(BaseTool):
 
     def draw_specific(self, ctx, canvas):
         if self.select_rect is not None:
-            self.draw_selection_rectangle(self, ctx, canvas.scale)
+            self.draw_selection_rectangle(ctx, canvas.scale)
+            return True
 
     def draw_selection_rectangle(self, ctx, scale):
         (ox, oy), (ex, ey) = self.select_rect

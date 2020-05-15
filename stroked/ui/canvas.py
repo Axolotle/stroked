@@ -24,9 +24,12 @@ class Canvas(Gtk.DrawingArea):
         # position of the mouse in pt
         self.mouse_pos = (0, 0)
 
+        self.set_can_focus(True)
+
         self.connect('button-press-event', self.on_mouse_press)
         self.connect('motion-notify-event', self.on_mouse_move)
         self.connect('button-release-event', self.on_mouse_release)
+        self.connect('key-press-event', self.on_key_press)
         self.connect('scroll-event', self.on_scroll)
         self.connect('enter-notify-event', self.on_cursor_changed)
         self.connect('leave-notify-event', self.on_cursor_changed)
@@ -182,6 +185,12 @@ class Canvas(Gtk.DrawingArea):
             canvas.queue_draw()
         self._tool.on_mouse_release(self, event)
         self.queue_draw()
+
+    def on_key_press(self, canvas, event):
+        self._tool.on_key_press(self, event)
+        self.queue_draw()
+        # stop propagation to avoid focus change
+        return True
 
     def on_scroll(self, canvas, event):
         prev_scale = self.scale
