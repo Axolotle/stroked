@@ -46,6 +46,9 @@ class Contour(DefContour):
         for point in self:
             point.selected = point in selection
 
+    def is_edge_point(self, point):
+        return point.segmentType == 'move' or point == self[-1]
+
     def get_pos_on_path(self, coords):
         for i in range(1, len(self)):
             if coords_are_between_points(self[i-1], self[i], coords):
@@ -56,3 +59,9 @@ class Contour(DefContour):
         point = self._pointClass(coords, segmentType='line')
         self.insertPoint(index, point)
         return point
+
+    def merge(self, contour):
+        contour.removePoint(contour[0])
+        for point in contour:
+            self.appendPoint(point)
+        contour.glyph.removeContour(contour)

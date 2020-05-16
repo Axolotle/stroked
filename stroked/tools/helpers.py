@@ -1,11 +1,11 @@
 import math
 
 
-def find_point_in_glyph(glyph, coordinates):
-    x, y = coordinates
+def find_point_in_glyph(glyph, coords, ignore=None):
+    x, y = coords
     for contour in reversed(glyph):
         for point in reversed(contour):
-            if x == point.x and y == point.y:
+            if point != ignore and x == point.x and y == point.y:
                 return (point, contour)
     return (None, None)
 
