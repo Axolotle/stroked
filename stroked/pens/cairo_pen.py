@@ -12,5 +12,9 @@ class CairoPen(BasePen):
     def _lineTo(self, pt):
         self.ctx.line_to(*pt)
 
+    def _closePath(self):
+        self.ctx.close_path()
+        self.endPath()
+
     def _endPath(self):
         self.ctx.stroke()
