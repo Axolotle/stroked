@@ -14,8 +14,8 @@ def round_point(pt):
     return (round(pt[0]), round(pt[1]))
 
 
-def mouse_in_range(pos, ref, threshold=0.25):
-    vx, vy = (pos[0] - ref[0], pos[1] - ref[1])
+def coords_in_range(coords, ref, threshold=0.25):
+    vx, vy = (coords[0] - ref[0], coords[1] - ref[1])
     norm = math.sqrt(vx**2 + vy**2)
     if norm <= threshold:
         return True

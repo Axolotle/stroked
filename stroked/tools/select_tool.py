@@ -2,7 +2,7 @@ from gi.repository import Gdk
 from math import pi
 
 from .base_tool import BaseTool
-from .helpers import find_point_in_glyph, round_point, mouse_in_range
+from .helpers import find_point_in_glyph, round_point, coords_in_range
 
 
 class SelectTool(BaseTool):
@@ -25,7 +25,7 @@ class SelectTool(BaseTool):
             locked_pos = round_point(pos)
             point, contour = find_point_in_glyph(glyph, locked_pos)
             if event.type == Gdk.EventType.BUTTON_PRESS:
-                pos_is_in_range = mouse_in_range(pos, locked_pos)
+                pos_is_in_range = coords_in_range(pos, locked_pos)
                 if pos_is_in_range and point is not None:
                     if event.state & Gdk.ModifierType.SHIFT_MASK:
                         selection = glyph.selection
@@ -126,7 +126,7 @@ class SelectTool(BaseTool):
 
     def draw_cursor(self, ctx, canvas):
         locked_pos = round_point(canvas.mouse_pos)
-        if not mouse_in_range(canvas.mouse_pos, locked_pos):
+        if not coords_in_range(canvas.mouse_pos, locked_pos):
             return
 
         pt, contour = find_point_in_glyph(canvas.glyph, locked_pos)
