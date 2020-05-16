@@ -1,4 +1,4 @@
-from gi.repository import Gtk, Gdk, GLib
+from gi.repository import Gdk
 from math import pi
 
 from .base_tool import BaseTool
@@ -17,38 +17,42 @@ class SelectTool(BaseTool):
     # ╰─────────────────────╯
 
     def on_mouse_press(self, canvas, event):
-        modifier = event.state & Gdk.ModifierType.SHIFT_MASK
-        double = event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS
-
         pos = canvas.mouse_pos
         glyph = canvas.glyph
 
         if event.button == Gdk.BUTTON_PRIMARY:
             self.drag_origin = pos
+            locked_pos = round_point(pos)
+            point, contour = find_point_in_glyph(glyph, locked_pos)
             if event.type == Gdk.EventType.BUTTON_PRESS:
-                locked_pos = round_point(pos)
                 pos_is_in_range = mouse_in_range(pos, locked_pos)
-                if pos_is_in_range:
-                    point, contour = find_point_in_glyph(glyph, locked_pos)
-                    if point:
-                        if modifier:
-                            selection = glyph.selection
-                            if point.selected:
-                                selection.remove(point)
-                            else:
-                                selection.add(point)
+                if pos_is_in_range and point is not None:
+                    if event.state & Gdk.ModifierType.SHIFT_MASK:
+                        selection = glyph.selection
+                        if point.selected:
+                            selection.remove(point)
                         else:
-                            if point.selected:
-                                selection = glyph.selection
-                            else:
-                                selection = set()
-                                selection.add(point)
-                        self.selection = selection
-                        return
+                            selection.add(point)
+                    else:
+                        if point.selected:
+                            selection = glyph.selection
+                        else:
+                            selection = set()
+                            selection.add(point)
+                    self.selection = selection
+                else:
+                    self.select_rect = (canvas.mouse_pos, canvas.mouse_pos)
 
-                self.select_rect = (canvas.mouse_pos, canvas.mouse_pos)
-            # if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
-                # self.on_right_click(canvas, canvas.mouse_pos, True, modifier)
+            elif event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
+                if point is None:
+                    for contour in reversed(glyph):
+                        index = contour.get_pos_on_path(pos)
+                        if index is not None:
+                            point = contour.insert_point(index, locked_pos)
+                            self.selection = set()
+                            self.selection.add(point)
+                            self.select_rect = None
+                            break
 
     def on_mouse_move(self, canvas, event):
         if event.state & Gdk.ModifierType.BUTTON1_MASK:
@@ -137,7 +141,6 @@ class SelectTool(BaseTool):
     def draw_specific(self, ctx, canvas):
         if self.select_rect is not None:
             self.draw_selection_rectangle(ctx, canvas.scale)
-            return True
 
     def draw_selection_rectangle(self, ctx, scale):
         (ox, oy), (ex, ey) = self.select_rect
