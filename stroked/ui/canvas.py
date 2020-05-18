@@ -187,7 +187,20 @@ class Canvas(Gtk.DrawingArea):
         self.queue_draw()
 
     def on_key_press(self, canvas, event):
-        self._tool.on_key_press(self, event)
+        key = Gdk.keyval_name(event.keyval)
+        if key == 'Delete':
+            glyph = self.glyph
+            for contour in glyph:
+                if contour.selected:
+                    glyph.removeContour(contour)
+                else:
+                    open = contour[0].segmentType == 'move'
+                    for point in contour.selection:
+                        contour.removePoint(point)
+                    if open:
+                        contour[0].segmentType = 'move'
+        else:
+            self._tool.on_key_press(self, event)
         self.queue_draw()
         # stop propagation to avoid focus change
         return True
