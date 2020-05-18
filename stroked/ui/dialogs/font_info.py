@@ -45,9 +45,12 @@ class WindowFontInfo(Gtk.Window):
     v_minor_spin_button = Gtk.Template.Child('version-minor-spin-button')
 
     masters_stack = Gtk.Template.Child('masters-stack')
-    masters_stack_bar = Gtk.Template.Child('masters-stack-bar')
+
+    instances_stack = Gtk.Template.Child('instances-stack')
+    instances_stack_bar = Gtk.Template.Child('instances-stack-bar')
 
     master_delete_button = Gtk.Template.Child('master-delete-button')
+    instance_delete_button = Gtk.Template.Child('instance-delete-button')
 
     def __init__(self, window):
         super().__init__(title='Font Info ' + window.filename,
@@ -88,8 +91,14 @@ class WindowFontInfo(Gtk.Window):
             stack_item = StackItemMaster(name, layer.lib)
             self.masters_stack.add_titled(stack_item, name, name)
 
+        for name, data in lib['instances'].items():
+            stack_item = StackItemInstance(name, data, self.font)
+            self.instances_stack.add_titled(stack_item, name, name)
+
         if len(self.masters_stack.get_children()) <= 1:
             self.master_delete_button.set_sensitive(False)
+        if len(self.instances_stack.get_children()) <= 1:
+            self.instance_delete_button.set_sensitive(False)
 
     def edit_info(self, prop, value):
         if value != getattr(self.info, prop):
@@ -129,11 +138,19 @@ class WindowFontInfo(Gtk.Window):
         self.edit_info('openTypeNameVersion',
                        'Version: {}.{:03d}'.format(major, minor))
 
-    def change_name(self, stack_item, name):
-        old_name = self.masters_stack.child_get_property(stack_item, 'title')
+    def change_master_name(self, stack_item, name):
+        stack = self.masters_stack
+        old_name = stack.child_get_property(stack_item, 'title')
         self.font._layers['master.' + old_name].name = 'master.' + name
-        self.masters_stack.child_set_property(stack_item, 'name', name)
-        self.masters_stack.child_set_property(stack_item, 'title', name)
+        stack.child_set_property(stack_item, 'name', name)
+        stack.child_set_property(stack_item, 'title', name)
+
+    def change_instance_name(self, stack_item, name):
+        stack = self.instances_stack
+        old_name = stack.child_get_property(stack_item, 'title')
+        self.lib['instances'][name] = self.lib['instances'].pop(old_name)
+        stack.child_set_property(stack_item, 'name', name)
+        stack.child_set_property(stack_item, 'title', name)
 
     def show_leading_zeros(self, widget):
         value = int(widget.get_adjustment().get_value())
@@ -145,18 +162,41 @@ class WindowFontInfo(Gtk.Window):
         master = self.font.add_master()
         name = master.name.split('.')[1]
         stack_item = StackItemMaster(name, master.lib)
-        self.masters_stack.add_titled(stack_item, name, name)
-        self.masters_stack.set_visible_child(stack_item)
-        if len(self.masters_stack.get_children()) > 1:
-            self.master_delete_button.set_sensitive(True)
+        stack = self.masters_stack
+        stack.add_titled(stack_item, name, name)
+        stack.set_visible_child(stack_item)
+        if len(stack.get_children()) > 1:
+            button.set_sensitive(True)
 
     @Gtk.Template.Callback('on_master_deleted')
     def _on_master_deleted(self, button):
-        stack_item = self.masters_stack.get_visible_child()
-        name = self.masters_stack.child_get_property(stack_item, 'title')
-        self.masters_stack.remove(stack_item)
+        stack = self.masters_stack
+        stack_item = stack.get_visible_child()
+        name = stack.child_get_property(stack_item, 'title')
+        stack.remove(stack_item)
         self.font.delete_master(name)
-        if len(self.masters_stack.get_children()) <= 1:
+        if len(stack.get_children()) <= 1:
+            button.set_sensitive(False)
+
+    @Gtk.Template.Callback('on_instance_added')
+    def _on_instance_added(self, button):
+        instance_ = self.font.add_instance()
+        name = instance_['style_name']
+        stack_item = StackItemInstance(name, instance_)
+        stack = self.instances_stack
+        stack.add_titled(stack_item, name, name)
+        stack.set_visible_child(stack_item)
+        if len(stack.get_children()) > 1:
+            button.set_sensitive(True)
+
+    @Gtk.Template.Callback('on_instance_deleted')
+    def _on_instance_deleted(self, button):
+        stack = self.instances_stack
+        stack_item = stack.get_visible_child()
+        name = stack.child_get_property(stack_item, 'title')
+        stack.remove(stack_item)
+        self.font.delete_instance(name)
+        if len(stack.get_children()) <= 1:
             button.set_sensitive(False)
 
 
@@ -222,7 +262,86 @@ class StackItemMaster(Gtk.Box):
         name = entry.get_text()
         if name != self.name:
             self.name = name
-            self.get_toplevel().change_name(self, name)
+            self.get_toplevel().change_master_name(self, name)
 
     def match_func(self, completion, model, iter):
         return True
+
+
+@Gtk.Template.from_resource('/space/autre/stroked/ui/instance_stack_item.ui')
+class StackItemInstance(Gtk.Box):
+    __gtype_name__ = 'StackItemInstance'
+
+    master = Gtk.Template.Child('master-combo')
+
+    style_name = Gtk.Template.Child('stylename-entry')
+    weight = Gtk.Template.Child('weight-combo')
+    width = Gtk.Template.Child('width-combo')
+
+    is_bold = Gtk.Template.Child('bold-checkbox')
+    is_italic = Gtk.Template.Child('italic-checkbox')
+    related_instance = Gtk.Template.Child('related-instance-combo')
+
+    linewidth = Gtk.Template.Child('linewidth-adj')
+    linejoin = Gtk.Template.Child('linejoin-combo')
+    linecap = Gtk.Template.Child('linecap-combo')
+    single_point = Gtk.Template.Child('single-point-combo')
+
+    def __init__(self, name, data, font):
+        super().__init__()
+
+        self.name = name
+        self.data = data
+
+        for layer in font._layers:
+            self.master.append(layer.name, layer.name)
+        for name in font.slib['instances'].keys():
+            self.related_instance.append(name, name)
+
+        self.hydrate()
+
+        for prop in self.__gtktemplate_widgets__.values():
+            widget = getattr(self, prop)
+            if isinstance(widget, Gtk.Adjustment):
+                widget.connect('value-changed', self.on_changed, prop)
+            elif isinstance(widget, Gtk.ComboBox):
+                widget.connect('changed', self.on_changed, prop)
+            elif isinstance(widget, Gtk.CheckButton):
+                widget.connect('toggled', self.on_toggled, prop)
+
+        self.style_name.connect('activate', self.on_name_changed)
+        self.style_name.connect('focus-out-event', self.on_name_changed)
+
+    def hydrate(self):
+        self.style_name.set_text(self.name)
+        for attr_name, value in self.data.items():
+            if value and hasattr(self, attr_name):
+                widget = getattr(self, attr_name)
+                if isinstance(widget, Gtk.Adjustment):
+                    widget.set_value(value)
+                elif isinstance(widget, Gtk.ComboBox):
+                    widget.set_active_id(str(value))
+                elif isinstance(widget, Gtk.CheckButton):
+                    widget.set_active(value)
+
+    # ╭─────────────────────╮
+    # │ GTK EVENTS HANDLERS │
+    # ╰─────────────────────╯
+
+    def on_changed(self, widget, prop):
+        if isinstance(widget, Gtk.Adjustment):
+            value = widget.get_value()
+        elif isinstance(widget, Gtk.ComboBox):
+            value = widget.get_active_id()
+            if prop not in ['master', 'related_instance']:
+                value = int(value)
+        self.data[prop] = value
+
+    def on_name_changed(self, entry, *args):
+        name = entry.get_text()
+        if name != self.style_name:
+            self.style_name = name
+            self.get_toplevel().change_instance_name(self, name)
+
+    def on_toggled(self, check_button, prop):
+        self.data[prop] = check_button.get_active()
