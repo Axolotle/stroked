@@ -11,6 +11,7 @@
    <glade-widget-class title="DateEntry" name="DateEntry" generic-name="dateentry" parent="GtkEntry"/>
    <glade-widget-class title="WindowFontInfo" name="WindowFontInfo" generic-name="windowfontinfo" parent="GtkWindow"/>
    <glade-widget-class title="MasterStackItem" name="MasterStackItem" generic-name="masterstackitem" parent="GtkBox"/>
+   <glade-widget-class title="InstanceStackItem" name="InstanceStackItem" generic-name="instancestackitem" parent="GtkBox"/>
  </glade-widget-classes>
 
  <glade-widget-group name="stroked" title="Stroked">
@@ -23,5 +24,6 @@
    <glade-widget-class-ref name="DateEntry"/>
    <glade-widget-class-ref name="WindowFontInfo"/>
    <glade-widget-class-ref name="MasterStackItem"/>
+   <glade-widget-class-ref name="InstanceStackItem"/>
  </glade-widget-group>
 </glade-catalog>
