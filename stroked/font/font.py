@@ -57,6 +57,9 @@ class Font(DefFont):
         self._layers.dirty = False
         self._layers.enableNotifications()
 
+        self.slib['instances'] = {}
+        self.add_instance(name='Regular')
+
         glyph_order = []
         for uni in range(32, 127):
             name = chr(uni)
@@ -90,3 +93,24 @@ class Font(DefFont):
         if is_default:
             first_master = self._layers[self._layers.layerOrder[0]]
             self._layers.defaultLayer = first_master
+
+    def add_instance(self, name='New Instance'):
+        instances = self.slib['instances']
+        instances[name] = {
+            'master': self._layers.defaultLayer.name.split('.')[-1],
+            'style_name': name,
+            'weight': 400,
+            'width': 5,
+            'is_bold': False,
+            'is_italic': False,
+            'related_instance': None,
+            'linewidth': 1,
+            'linejoin': 1,
+            'linecap': 1,
+            'single_point': 1
+        }
+        return instances[name]
+
+    def delete_instance(self, name):
+        instances = self.slib['instances']
+        instances.pop(name)
