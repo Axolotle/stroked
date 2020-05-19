@@ -36,6 +36,10 @@ class Font(DefFont):
         self._active_master_name = name
 
     @property
+    def instances(self):
+        return self.slib['instances']
+
+    @property
     def grid(self):
         return (self.slib['gridWidth'], self.slib['gridHeight'])
 
@@ -103,7 +107,7 @@ class Font(DefFont):
             'width': 5,
             'is_bold': False,
             'is_italic': False,
-            'related_instance': None,
+            'related_instance': False,
             'linewidth': 1,
             'linejoin': 1,
             'linecap': 1,

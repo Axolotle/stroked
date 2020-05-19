@@ -47,6 +47,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
     def set_actions(self, app):
         actions = [
             ['font_info', ['<primary>i']],
+            ['export', ['<primary>e']],
         ]
 
         for name, shortcuts in actions:
@@ -62,6 +63,15 @@ class StrokedWindow(Gtk.ApplicationWindow):
     def on_font_info(self, action, param):
         dialog = dialogs.WindowFontInfo(self)
         dialog.show()
+
+    def on_export(self, action, param):
+        dialog = dialogs.DialogExport(self)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            options = dialog.get_options()
+            print(options)
+            # TODO export
+        dialog.destroy()
 
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │

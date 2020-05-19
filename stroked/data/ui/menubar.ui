@@ -61,6 +61,14 @@
               </object>
             </child>
             <child>
+              <object class="GtkMenuItem">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="action_name">win.export</property>
+                <property name="label" translatable="yes">Export</property>
+              </object>
+            </child>
+            <child>
               <object class="GtkSeparatorMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -176,7 +184,6 @@
             <property name="can_focus">False</property>
             <child>
               <object class="GtkImageMenuItem">
-                <property name="label">gtk-about</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_underline">True</property>
