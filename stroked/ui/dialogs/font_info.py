@@ -182,7 +182,7 @@ class WindowFontInfo(Gtk.Window):
     def _on_instance_added(self, button):
         instance_ = self.font.add_instance()
         name = instance_['style_name']
-        stack_item = StackItemInstance(name, instance_)
+        stack_item = StackItemInstance(name, instance_, self.font)
         stack = self.instances_stack
         stack.add_titled(stack_item, name, name)
         stack.set_visible_child(stack_item)
