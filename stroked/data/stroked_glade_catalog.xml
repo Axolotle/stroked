@@ -8,6 +8,7 @@
    <glade-widget-class title="Toolbar" name="Toolbar" generic-name="toolbar" parent="GtkToolbar"/>
    <glade-widget-class title="Canvas" name="Canvas" generic-name="canvas" parent="GtkDrawingArea"/>
    <glade-widget-class title="DialogAskSave" name="DialogAskSave" generic-name="dialogasksave" parent="GtkDialog"/>
+   <glade-widget-class title="DialogExport" name="DialogExport" generic-name="dialogexport" parent="GtkDialog"/>
    <glade-widget-class title="DateEntry" name="DateEntry" generic-name="dateentry" parent="GtkEntry"/>
    <glade-widget-class title="WindowFontInfo" name="WindowFontInfo" generic-name="windowfontinfo" parent="GtkWindow"/>
    <glade-widget-class title="MasterStackItem" name="MasterStackItem" generic-name="masterstackitem" parent="GtkBox"/>
@@ -21,6 +22,7 @@
    <glade-widget-class-ref name="Toolbar"/>
    <glade-widget-class-ref name="Canvas"/>
    <glade-widget-class-ref name="DialogAskSave"/>
+   <glade-widget-class-ref name="DialogExport"/>
    <glade-widget-class-ref name="DateEntry"/>
    <glade-widget-class-ref name="WindowFontInfo"/>
    <glade-widget-class-ref name="MasterStackItem"/>
