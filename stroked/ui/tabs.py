@@ -17,10 +17,13 @@ class Tabs(Gtk.Notebook):
 
     @property
     def active_tab(self):
-        return self.get_nth_page(self.get_current_page())
+        return self.get_nth_page(self.get_current_page()).get_children()[0]
 
     def add_tab(self, title):
+        # Pack the canvas in a box to avoid context glitches
         canvas = Canvas()
+        container = Gtk.Box()
+        container.pack_start(canvas, True, True, 0)
         box = Gtk.HBox(spacing=10)
         close_button = Gtk.Button.new_from_icon_name(
             'gtk-close', Gtk.IconSize.MENU)
@@ -31,7 +34,7 @@ class Tabs(Gtk.Notebook):
         box.pack_end(close_button, False, False, 0)
         box.show_all()
 
-        num = self.append_page(canvas, box)
+        num = self.append_page(container, box)
         self.show_all()
 
         return num
@@ -79,4 +82,5 @@ class Tabs(Gtk.Notebook):
             prev_tab._tool.reset(prev_tab)
         if num > 0:
             glyph_name = self.get_tab_label(tab).get_children()[0].get_label()
-            self.emit('current_glyph_changed', tab, glyph_name)
+            self.emit('current_glyph_changed',
+                      tab.get_children()[0], glyph_name)
