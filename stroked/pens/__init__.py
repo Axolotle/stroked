@@ -1,4 +1,5 @@
-from .cairo_pen import CairoPen
+from .cairo_pen import CairoStrokePen, CairoShapePen
+from .stroked_point_pen import StrokeToShapePointPen
 
 
-__all__ = ['CairoPen']
+__all__ = ['CairoStrokePen', 'CairoShapePen', 'StrokeToShapePointPen']
