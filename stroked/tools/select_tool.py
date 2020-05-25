@@ -78,9 +78,9 @@ class SelectTool(BaseTool):
                 selection.update(points)
             else:
                 selection = self.selection
-        glyph.selection = selection
-        self.select_rect = None
-        self.selection = None
+            glyph.selection = selection
+            self.select_rect = None
+            self.selection = None
 
     def on_key_press(self, canvas, event):
         translations = {

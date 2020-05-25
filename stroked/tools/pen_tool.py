@@ -76,10 +76,6 @@ class PenTool(BaseTool):
     def stop_drawing(self, canvas):
         contour = self.contour
         contour.removePoint(contour[-1])
-        if len(contour) == 1:
-            # FIXME use a specific pen to draw single point contour
-            point = contour[0].x, contour[0].y
-            contour.addPoint(point, 'line')
         self.contour = None
 
     # ╭──────────────╮
