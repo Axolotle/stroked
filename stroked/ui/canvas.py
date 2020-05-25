@@ -2,10 +2,8 @@ import weakref
 from math import pi
 
 from gi.repository import Gtk, Gdk
-import cairo
 
-import stroked.settings as stg
-from stroked.pens import CairoPen
+from stroked.pens import CairoStrokePen, CairoShapePen, ContourOffsetPointPen
 
 
 class Canvas(Gtk.DrawingArea):
@@ -82,17 +80,18 @@ class Canvas(Gtk.DrawingArea):
         self.draw_grid(ctx, grid)
 
         ctx.set_source_rgba(1.0, 1.0, 1.0, 1.0)
-        linestyle = stg.get('linestyle')
-        ctx.set_line_width(linestyle['linewidth'])
-        ctx.set_line_cap(linestyle['linecap'])
-        ctx.set_line_join(linestyle['linejoin'])
+        ctx.set_line_width(5 / self.scale)
 
-        # avoid linejoin and linecap problems
-        ctx.set_tolerance(1)
-        glyph.draw(CairoPen(ctx))
+        ctx.save()
+        pen = ContourOffsetPointPen(CairoShapePen(ctx))
+        glyph.drawPoints(pen)
+        glyph.draw(CairoStrokePen(ctx))
+        pts = pen.get_data()
+        ctx.restore()
 
-        ctx.set_tolerance(0.1)
         self.draw_points(ctx, glyph)
+        if pts:
+            self.draw_points_generic(ctx, pts)
 
         if self.mouse_pos:
             self._tool.draw_cursor(ctx, self)
@@ -129,6 +128,16 @@ class Canvas(Gtk.DrawingArea):
         for point in selection:
             ctx.arc(point.x, point.y, r_selected, 0.0, pi2)
             ctx.fill()
+
+    def draw_points_generic(self, ctx, points):
+        ctx.save()
+        r = 7.5 / self.scale
+        ctx.set_source_rgb(1, 0, 106/255)
+        pi2 = 2 * pi
+        for point in points:
+            ctx.arc(point[0], point[1], r, 0.0, pi2)
+            ctx.fill()
+        ctx.restore()
 
     # ╭─────────────────────╮
     # │ COORDINATES HELPERS │
