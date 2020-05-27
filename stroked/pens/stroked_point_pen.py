@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 import math
 
 from fontTools.pens.pointPen import AbstractPointPen
@@ -9,19 +9,19 @@ _arc_tolerance = 0.25
 _miter_limit = 4.0
 
 
-class Linecap(Enum):
+class Linecap(IntEnum):
     BUTT = 0
     ROUND = 1
     SQUARE = 2
 
 
-class Linejoin(Enum):
+class Linejoin(IntEnum):
     MITER = 0
     ROUND = 1
     BEVEL = 2
 
 
-class Pointcap(Enum):
+class Pointcap(IntEnum):
     ROUND = 1
     SQUARE = 2
 
@@ -50,8 +50,8 @@ class ContourOffsetPointPen(AbstractPointPen):
     '''
 
     def __init__(self, segmentPen,
-                 thickness=1, linejoin=Linejoin.ROUND, linecap=Linecap.ROUND,
-                 pointcap=Pointcap.ROUND,
+                 linewidth=1, linejoin=Linejoin.BEVEL, linecap=Linecap.SQUARE,
+                 pointcap=Pointcap.SQUARE,
                  miter_lim=_miter_limit, arc_tol=_arc_tolerance):
         self.pen = segmentPen
 
@@ -66,7 +66,7 @@ class ContourOffsetPointPen(AbstractPointPen):
         self.linecap_type = linecap
         self.pointcap_type = pointcap
 
-        self.delta = thickness * 100 / 2
+        self.delta = linewidth * 100 / 2
         self.miter_lim = 2 / (miter_lim * miter_lim) if miter_lim > 2 else 0.5
         self.lowest_x = -1
 
