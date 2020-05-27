@@ -1,3 +1,4 @@
+import os
 from datetime import date
 
 from defcon import Font as DefFont
@@ -118,3 +119,37 @@ class Font(DefFont):
     def delete_instance(self, name):
         instances = self.slib['instances']
         instances.pop(name)
+
+    def export(self, format_type, options):
+        if format_type == 'otf':
+            pass
+        elif format_type == 'ufo':
+            from stroked.pens.stroked_point_pen import ContourOffsetPointPen
+            instances, folder = options.values()
+            infos = self.info.getDataForSerialization()
+            lib = self.lib.getDataForSerialization()
+            # Remove specific part of the lib
+            del lib['space.autre.stroked']
+
+            for name in instances:
+                data = self.instances[name]
+                master = self._layers[data['master']]
+                font = DefFont()
+                font.info.setDataFromSerialization(infos)
+                font.info.styleName = data['style_name']
+                font.lib.setDataFromSerialization(lib)
+                for glyph in master:
+                    new_glyph = font.newGlyph(glyph.name)
+                    new_glyph.unicodes = glyph.unicodes
+                    out_pen = ContourOffsetPointPen(
+                        new_glyph.getPen(),
+                        linewidth=data['linewidth'],
+                        linecap=data['linecap'],
+                        pointcap=data['single_point'],
+                        linejoin=data['linejoin'],
+                    )
+                    glyph.drawPoints(out_pen)
+                filename = '{}-{}.ufo'.format(
+                    infos['familyName'], data['style_name']
+                ).replace(' ', '').lower()
+                font.save(path=os.path.join(folder, filename))
