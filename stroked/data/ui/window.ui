@@ -3,55 +3,15 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <requires lib="stroked" version="0.0"/>
-  <object class="GtkListStore" id="linecap_store">
-    <columns>
-      <!-- column-name line_cap -->
-      <column type="gint"/>
-      <!-- column-name line_cap_str -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0">0</col>
-        <col id="1" translatable="yes">Butt</col>
-      </row>
-      <row>
-        <col id="0">1</col>
-        <col id="1" translatable="yes">Round</col>
-      </row>
-      <row>
-        <col id="0">2</col>
-        <col id="1" translatable="yes">Square</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkListStore" id="linejoin_store">
-    <columns>
-      <!-- column-name line_join -->
-      <column type="gint"/>
-      <!-- column-name line_join_str -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0">0</col>
-        <col id="1" translatable="yes">Miter</col>
-      </row>
-      <row>
-        <col id="0">1</col>
-        <col id="1" translatable="yes">Round</col>
-      </row>
-      <row>
-        <col id="0">2</col>
-        <col id="1" translatable="yes">Bevel</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkAdjustment" id="linewidth_adj">
+  <object class="GtkAdjustment" id="linewidth-cairo-adj">
     <property name="upper">2</property>
     <property name="step_increment">0.01</property>
     <property name="page_increment">1</property>
-    <signal name="value-changed" handler="on_linestyle_changed" object="linewidth" swapped="no"/>
+  </object>
+  <object class="GtkAdjustment" id="linewidth-stroked-adj">
+    <property name="upper">2</property>
+    <property name="step_increment">0.01</property>
+    <property name="page_increment">1</property>
   </object>
   <object class="GtkListStore" id="masters-store">
     <columns>
@@ -161,77 +121,185 @@
                 <property name="margin_top">5</property>
                 <property name="margin_bottom">5</property>
                 <property name="orientation">vertical</property>
+                <property name="spacing">10</property>
                 <child>
-                  <object class="GtkBox" id="canvas_settings">
-                    <property name="width_request">200</property>
+                  <object class="GtkFrame">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="orientation">vertical</property>
+                    <property name="label_xalign">0.05000000074505806</property>
                     <child>
-                      <object class="GtkFrame">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label_xalign">0.05000000074505806</property>
+                        <property name="margin_left">10</property>
+                        <property name="margin_right">10</property>
+                        <property name="margin_top">5</property>
+                        <property name="margin_bottom">10</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
                         <child>
-                          <object class="GtkAlignment">
+                          <object class="GtkStackSwitcher">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="margin_left">5</property>
-                            <property name="margin_right">5</property>
-                            <property name="margin_bottom">5</property>
-                            <property name="top_padding">5</property>
-                            <property name="bottom_padding">5</property>
-                            <property name="left_padding">5</property>
-                            <property name="right_padding">5</property>
+                            <property name="icon_size">0</property>
+                            <property name="stack">style-stack</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkStack" id="style-stack">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="vhomogeneous">False</property>
+                            <child>
+                              <object class="GtkGrid">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="row_spacing">2</property>
+                                <property name="column_spacing">15</property>
+                                <property name="row_homogeneous">True</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Width</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Linejoin</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Linecap</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Pointcap</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">3</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="linewidth-cairo-spin-button">
+                                    <property name="name">linewidth</property>
+                                    <property name="width_request">150</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="max_length">6</property>
+                                    <property name="width_chars">6</property>
+                                    <property name="text" translatable="yes">1,000</property>
+                                    <property name="caps_lock_warning">False</property>
+                                    <property name="input_purpose">digits</property>
+                                    <property name="adjustment">linewidth-cairo-adj</property>
+                                    <property name="climb_rate">0.01</property>
+                                    <property name="digits">3</property>
+                                    <property name="numeric">True</property>
+                                    <property name="value">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="linejoin-cairo-combo">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="active">0</property>
+                                    <items>
+                                      <item id="0" translatable="yes">Miter</item>
+                                      <item id="1" translatable="yes">Round</item>
+                                      <item id="2" translatable="yes">Bevel</item>
+                                    </items>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="linecap-cairo-combo">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="active">0</property>
+                                    <items>
+                                      <item id="0" translatable="yes">Butt</item>
+                                      <item id="1" translatable="yes">Round</item>
+                                      <item id="2" translatable="yes">Square</item>
+                                    </items>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="pointcap-cairo-combo">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="active">0</property>
+                                    <items>
+                                      <item id="0" translatable="yes">Miter</item>
+                                      <item id="1" translatable="yes">Round</item>
+                                      <item id="2" translatable="yes">Square</item>
+                                    </items>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">3</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="name">cairo</property>
+                                <property name="title" translatable="yes">Basic</property>
+                              </packing>
+                            </child>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="orientation">vertical</property>
-                                <property name="spacing">5</property>
                                 <child>
-                                  <object class="GtkBox">
+                                  <object class="GtkComboBoxText" id="instances-combo">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="spacing">10</property>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Linecap</property>
-                                        <property name="single_line_mode">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkComboBox" id="linecap">
-                                        <property name="name">linecap</property>
-                                        <property name="width_request">150</property>
-                                        <property name="visible">True</property>
-                                        <property name="app_paintable">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="model">linecap_store</property>
-                                        <property name="active">1</property>
-                                        <property name="id_column">0</property>
-                                        <signal name="changed" handler="on_linestyle_changed" swapped="no"/>
-                                        <child>
-                                          <object class="GtkCellRendererText" id="test"/>
-                                          <attributes>
-                                            <attribute name="text">1</attribute>
-                                          </attributes>
-                                        </child>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="pack_type">end</property>
-                                        <property name="position">2</property>
-                                      </packing>
-                                    </child>
+                                    <property name="active">0</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -239,131 +307,165 @@
                                     <property name="position">0</property>
                                   </packing>
                                 </child>
+                              </object>
+                              <packing>
+                                <property name="name">instances</property>
+                                <property name="title" translatable="yes">Instances</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkGrid">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="row_spacing">2</property>
+                                <property name="column_spacing">15</property>
+                                <property name="row_homogeneous">True</property>
                                 <child>
-                                  <object class="GtkBox">
+                                  <object class="GtkLabel">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="spacing">10</property>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Linejoin</property>
-                                        <property name="single_line_mode">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkComboBox" id="linejoin">
-                                        <property name="name">linejoin</property>
-                                        <property name="width_request">150</property>
-                                        <property name="visible">True</property>
-                                        <property name="app_paintable">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="model">linejoin_store</property>
-                                        <property name="active">1</property>
-                                        <property name="id_column">0</property>
-                                        <signal name="changed" handler="on_linestyle_changed" swapped="no"/>
-                                        <child>
-                                          <object class="GtkCellRendererText"/>
-                                          <attributes>
-                                            <attribute name="text">1</attribute>
-                                          </attributes>
-                                        </child>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="pack_type">end</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
+                                    <property name="label" translatable="yes">Width</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">0</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkBox">
+                                  <object class="GtkLabel">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <property name="spacing">10</property>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">Width</property>
-                                        <property name="single_line_mode">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkSpinButton" id="linewidth">
-                                        <property name="name">linewidth</property>
-                                        <property name="width_request">150</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="max_length">6</property>
-                                        <property name="width_chars">6</property>
-                                        <property name="text" translatable="yes">1,000</property>
-                                        <property name="caps_lock_warning">False</property>
-                                        <property name="input_purpose">digits</property>
-                                        <property name="adjustment">linewidth_adj</property>
-                                        <property name="climb_rate">0.01</property>
-                                        <property name="digits">3</property>
-                                        <property name="numeric">True</property>
-                                        <property name="value">1</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="pack_type">end</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
+                                    <property name="label" translatable="yes">Linejoin</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">2</property>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Linecap</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Pointcap</property>
+                                    <property name="single_line_mode">True</property>
+                                    <property name="xalign">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">0</property>
+                                    <property name="top_attach">3</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSpinButton" id="linewidth-stroked-spin-button">
+                                    <property name="name">linewidth</property>
+                                    <property name="width_request">150</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="max_length">6</property>
+                                    <property name="width_chars">6</property>
+                                    <property name="text" translatable="yes">1,000</property>
+                                    <property name="caps_lock_warning">False</property>
+                                    <property name="input_purpose">digits</property>
+                                    <property name="adjustment">linewidth-stroked-adj</property>
+                                    <property name="climb_rate">0.01</property>
+                                    <property name="digits">3</property>
+                                    <property name="numeric">True</property>
+                                    <property name="value">1</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="linejoin-stroked-combo">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="active">0</property>
+                                    <items>
+                                      <item id="0" translatable="yes">Miter</item>
+                                      <item id="1" translatable="yes">Round</item>
+                                      <item id="2" translatable="yes">Bevel</item>
+                                    </items>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="linecap-stroked-combo">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="active">0</property>
+                                    <items>
+                                      <item id="0" translatable="yes">Butt</item>
+                                      <item id="1" translatable="yes">Round</item>
+                                      <item id="2" translatable="yes">Square</item>
+                                    </items>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="pointcap-stroked-combo">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="active">0</property>
+                                    <items>
+                                      <item id="0" translatable="yes">Miter</item>
+                                      <item id="1" translatable="yes">Round</item>
+                                      <item id="2" translatable="yes">Square</item>
+                                    </items>
+                                  </object>
+                                  <packing>
+                                    <property name="left_attach">1</property>
+                                    <property name="top_attach">3</property>
                                   </packing>
                                 </child>
                               </object>
+                              <packing>
+                                <property name="name">stroked</property>
+                                <property name="title" translatable="yes">Stroked</property>
+                                <property name="position">2</property>
+                              </packing>
                             </child>
                           </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="margin_left">5</property>
-                            <property name="margin_right">5</property>
-                            <property name="label" translatable="yes">Stroke preview</property>
-                            <property name="single_line_mode">True</property>
-                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
                     </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
+                    <child type="label">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Stroke preview</property>
+                        <property name="single_line_mode">True</property>
+                      </object>
                     </child>
                   </object>
                   <packing>
@@ -373,6 +475,9 @@
                   </packing>
                 </child>
                 <child>
+                  <placeholder/>
+                </child>
+                <child>
                   <object class="GtkFrame">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -380,52 +485,43 @@
                     <property name="margin_bottom">5</property>
                     <property name="label_xalign">0.05000000074505806</property>
                     <child>
-                      <object class="GtkAlignment">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="margin_left">5</property>
-                        <property name="margin_right">5</property>
-                        <property name="margin_bottom">5</property>
-                        <property name="top_padding">5</property>
-                        <property name="bottom_padding">5</property>
-                        <property name="left_padding">5</property>
-                        <property name="right_padding">5</property>
+                        <property name="margin_left">10</property>
+                        <property name="margin_right">10</property>
+                        <property name="margin_top">5</property>
+                        <property name="margin_bottom">10</property>
+                        <property name="orientation">vertical</property>
+                        <property name="spacing">5</property>
                         <child>
-                          <object class="GtkBox">
+                          <object class="GtkTreeView">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">5</property>
+                            <property name="can_focus">True</property>
+                            <property name="model">masters-store</property>
+                            <property name="headers_visible">False</property>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection" id="masters-selection">
+                                <signal name="changed" handler="on_master_select_changed" swapped="no"/>
+                              </object>
+                            </child>
                             <child>
-                              <object class="GtkTreeView">
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="model">masters-store</property>
-                                <property name="headers_visible">False</property>
-                                <child internal-child="selection">
-                                  <object class="GtkTreeSelection" id="masters-selection">
-                                    <signal name="changed" handler="on_master_select_changed" swapped="no"/>
-                                  </object>
-                                </child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">masters</property>
                                 <child>
-                                  <object class="GtkTreeViewColumn">
-                                    <property name="title" translatable="yes">masters</property>
-                                    <child>
-                                      <object class="GtkCellRendererText"/>
-                                      <attributes>
-                                        <attribute name="text">0</attribute>
-                                      </attributes>
-                                    </child>
-                                  </object>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
                                 </child>
                               </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
                             </child>
                           </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
                         </child>
                       </object>
                     </child>
@@ -443,7 +539,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>

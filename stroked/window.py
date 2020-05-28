@@ -75,21 +75,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
     # │ GTK EVENTS HANDLERS │
     # ╰─────────────────────╯
 
-    @Gtk.Template.Callback('on_linestyle_changed')
-    def _on_linestyle_changed(self, elem):
-        property_name = None
-        property_value = None
-        if isinstance(elem, Gtk.ComboBox):
-            property_name = elem.get_name()
-            if property_name in ['linecap', 'linejoin']:
-                property_value = elem.get_active()
-        elif isinstance(elem, Gtk.SpinButton):
-            property_name = elem.get_name()
-            property_value = elem.get_value()
-
-        stg.set(['linestyle', property_name], property_value)
-        self.tabs.update_tab_draw()
-
     @Gtk.Template.Callback('on_keypress')
     def _on_keypress(self, widget, event):
         if not event.state & Gdk.ModifierType.CONTROL_MASK:
