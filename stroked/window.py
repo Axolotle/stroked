@@ -1,7 +1,6 @@
 from gi.repository import Gtk, Gdk, Gio
 
 from stroked.ui import dialogs, Canvas
-import stroked.settings as stg
 
 
 @Gtk.Template.from_resource('/space/autre/stroked/ui/window.ui')
@@ -76,7 +75,16 @@ class StrokedWindow(Gtk.ApplicationWindow):
     # ╰─────────────────────╯
 
     @Gtk.Template.Callback('on_keypress')
-    def _on_keypress(self, widget, event):
+    def _on_keypress(self, window, event):
+        focused_widget = self.get_focus()
+        if (
+            isinstance(focused_widget, Gtk.Editable)
+            and event.state & Gdk.ModifierType.MOD2_MASK
+            and event.keyval in [97, 112]
+        ):
+            # FIXME hacky way of not triggering tools accelerators
+            focused_widget.do_key_press_event(focused_widget, event)
+            return Gdk.EVENT_STOP
         if not event.state & Gdk.ModifierType.CONTROL_MASK:
             return
         key_name = Gdk.keyval_name(event.keyval)
