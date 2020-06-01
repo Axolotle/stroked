@@ -1,6 +1,6 @@
 from gi.repository import Gtk, Gdk, Gio
 
-from stroked.ui import dialogs, Canvas
+from stroked.ui import dialogs
 
 
 @Gtk.Template.from_resource('/space/autre/stroked/ui/window.ui')
@@ -43,6 +43,10 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.font.layers.addObserver(
             self, 'on_master_renamed', 'LayerSet.LayerNameChanged')
 
+    # ╭──────────────────────╮
+    # │ GTK ACTIONS HANDLERS │
+    # ╰──────────────────────╯
+
     def set_actions(self, app):
         actions = [
             ['font_info', ['<primary>i']],
@@ -54,10 +58,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
             action.connect('activate', getattr(self, 'on_' + name))
             self.add_action(action)
             app.set_accels_for_action('win.' + name, shortcuts)
-
-    # ╭──────────────────────╮
-    # │ GTK ACTIONS HANDLERS │
-    # ╰──────────────────────╯
 
     def on_font_info(self, action, param):
         dialog = dialogs.WindowFontInfo(self)
@@ -73,16 +73,18 @@ class StrokedWindow(Gtk.ApplicationWindow):
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │
     # ╰─────────────────────╯
+    # methods defined with a decorator `@Gtk.Template.Callback` are defined in
+    # the template's xml ui file.
 
     @Gtk.Template.Callback('on_keypress')
     def _on_keypress(self, window, event):
         focused_widget = self.get_focus()
         if (
-            isinstance(focused_widget, Gtk.Editable)
-            and event.state & Gdk.ModifierType.MOD2_MASK
+            isinstance(focused_widget, Gtk.Entry)
+            and (not event.state or event.state & Gdk.ModifierType.MOD2_MASK)
             and event.keyval in [97, 112]
         ):
-            # FIXME hacky way of not triggering tools accelerators
+            # FIXME hacky way to not trigger tools accelerators
             focused_widget.do_key_press_event(focused_widget, event)
             return Gdk.EVENT_STOP
         if not event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -112,19 +114,21 @@ class StrokedWindow(Gtk.ApplicationWindow):
     def _on_master_select_changed(self, selection):
         model, treeiter = selection.get_selected()
         self.font.active_master = model[treeiter][0]
-        active_tab = self.tabs.active_tab
-        if isinstance(active_tab, Canvas):
-            active_tab._tool.reset(active_tab)
-            active_tab.glyph = self.font.active_master[active_tab.glyph.name]
+        curr_canvas = self.tabs.active_canvas
+        if curr_canvas is not None:
+            curr_canvas._tool.reset()
+            curr_canvas.glyph = self.font.active_master[curr_canvas.glyph.name]
 
     def on_current_glyph_changed(self, tabs, canvas, glyph_name):
         canvas._tool = self.toolbar.current_tool
         canvas.glyph = self.font.active_master[glyph_name]
 
     def on_current_tool_changed(self, widget, tool):
-        current_canvas = self.tabs.active_tab
-        current_canvas._tool.reset(current_canvas)
-        current_canvas._tool = tool
+        curr_canvas = self.tabs.active_canvas
+        if curr_canvas is not None:
+            # Reset previous tool
+            curr_canvas._tool.reset()
+            curr_canvas._tool = tool
 
     # ╭────────────────────────╮
     # │ DEFCON EVENTS HANDLERS │

@@ -17,70 +17,88 @@ class Tabs(Gtk.Notebook):
 
     @property
     def active_tab(self):
-        return self.get_nth_page(self.get_current_page()).get_children()[0]
+        return self.get_nth_page(self.get_current_page())
 
-    def add_tab(self, title):
+    @property
+    def active_canvas(self):
+        index = self.get_current_page()
+        if index == 0:
+            return None
+        return self.get_nth_page(index).get_children()[0]
+
+    def add_tab(self, label_text):
         # Pack the canvas in a box to avoid context glitches
+        tab = Gtk.Box()
         canvas = Canvas()
-        container = Gtk.Box()
-        container.pack_start(canvas, True, True, 0)
-        box = Gtk.HBox(spacing=10)
-        close_button = Gtk.Button.new_from_icon_name(
-            'gtk-close', Gtk.IconSize.MENU)
-        close_button.set_relief(Gtk.ReliefStyle.NONE)
-        close_button.connect('clicked', self.on_tab_close, canvas)
+        tab.pack_start(canvas, True, True, 0)
 
-        box.pack_start(Gtk.Label(title), True, True, 0)
-        box.pack_end(close_button, False, False, 0)
-        box.show_all()
+        tab_label = Gtk.HBox(spacing=10)
+        btn = Gtk.Button.new_from_icon_name('gtk-close', Gtk.IconSize.MENU)
+        btn.set_relief(Gtk.ReliefStyle.NONE)
+        btn.connect('clicked', self.on_close_button_clicked, tab)
+        tab_label.pack_start(Gtk.Label(label_text), True, True, 0)
+        tab_label.pack_end(btn, False, False, 0)
+        tab_label.show_all()
 
-        num = self.append_page(container, box)
+        index = self.append_page(tab, tab_label)
         self.show_all()
+        return index
 
-        return num
+    def rename_tab(self, index, name):
+        tab = self.get_nth_page(index)
+        label_widget = self.get_tab_label(tab).get_children()[0]
+        label_widget.set_label(name)
 
-    def close_tab(self, num=None):
-        if num is None:
-            num = self.get_current_page()
-        if num > 0:
-            self.remove_page(num)
+    def open_tab(self, label_text):
+        index = self.get_tab_index_from_label(label_text)
+        if index is None:
+            index = self.add_tab(label_text)
+        self.set_current_page(index)
 
-    def update_tab_draw(self, num=None):
-        if num is None:
-            num = self.get_current_page()
-        if num > 0:
-            self.get_nth_page(num).queue_draw()
+    def close_tab(self, index=None):
+        if index is None:
+            index = self.get_current_page()
+        if index > 0:
+            self.remove_page(index)
 
-    def find_num_from_tab_object(self, tab_object):
-        for num in range(1, self.get_n_pages()):
-            tab = self.get_nth_page(num)
-            if tab == tab_object:
-                return num
+    def get_tab_label_text(self, tab):
+        # Be careful, this is an overiding of the base `Notebook`'s method
+        # `get_tab_label_text` since the label is actually a box with a label
+        # and a button.
+        return self.get_tab_label(tab).get_children()[0].get_label()
+
+    def set_tab_label_text(self, tab, text):
+        # Be careful, same as above method
+        self.get_tab_label(tab).get_children()[0].set_label(text)
+
+    def get_tab_index_from_widget(self, widget):
+        for index in range(1, self.get_n_pages()):
+            if widget == self.get_nth_page(index):
+                return index
         return None
 
-    def find_num_from_tab_label(self, label):
-        for num in range(1, self.get_n_pages()):
-            tab = self.get_nth_page(num)
-            tab_label = self.get_tab_label(tab).get_children()[0].get_label()
-            if label == tab_label:
-                return num
+    def get_tab_index_from_label(self, text):
+        for index in range(1, self.get_n_pages()):
+            if text == self.get_tab_label_text(self.get_nth_page(index)):
+                return index
         return None
-
-    def on_tab_close(self, button, tab):
-        num = self.find_num_from_tab_object(tab)
-        if num is not None:
-            self.close_tab(num)
 
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │
     # ╰─────────────────────╯
+    # Methods defined with a decorator `@Gtk.Template.Callback` are defined in
+    # the template's xml ui file.
 
     @Gtk.Template.Callback('on_page_switched')
-    def _on_page_switched(self, tabs, tab, num):
-        prev_tab = self.active_tab
-        if isinstance(prev_tab, Canvas):
-            prev_tab._tool.reset(prev_tab)
-        if num > 0:
-            glyph_name = self.get_tab_label(tab).get_children()[0].get_label()
-            self.emit('current_glyph_changed',
-                      tab.get_children()[0], glyph_name)
+    def _on_page_switched(self, tabs, tab, index):
+        # FIXME, tool need to be reset even if the next tab is the glyphlist
+        # try to do that in another scope.
+        self.get_toplevel().toolbar.current_tool.reset()
+        if index > 0:
+            glyph_name = self.get_tab_label_text(tab)
+            canvas = tab.get_children()[0]
+            self.emit('current_glyph_changed', canvas, glyph_name)
+
+    def on_close_button_clicked(self, button, tab):
+        index = self.get_tab_index_from_widget(tab)
+        self.close_tab(index)
