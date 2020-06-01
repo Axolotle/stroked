@@ -18,8 +18,7 @@ class PenTool(BaseTool):
         if event.button == Gdk.BUTTON_PRIMARY:
             self.add_point(canvas.glyph, round_point(canvas.mouse_pos))
         elif event.button == Gdk.BUTTON_SECONDARY:
-            if self.contour:
-                self.stop_drawing(canvas)
+            self.reset()
 
     def on_mouse_move(self, canvas, event):
         coords = round_point(canvas.mouse_pos)
@@ -32,9 +31,10 @@ class PenTool(BaseTool):
     # │ TOOL METHODS │
     # ╰──────────────╯
 
-    def reset(self, canvas):
+    def reset(self):
         if self.contour:
-            self.stop_drawing(canvas)
+            self.delete_last_point()
+            self.contour = None
 
     def add_point(self, glyph, coords):
         contour = self.contour
@@ -73,10 +73,9 @@ class PenTool(BaseTool):
         point = self.contour[-1]
         point.x, point.y = pt
 
-    def stop_drawing(self, canvas):
+    def delete_last_point(self):
         contour = self.contour
         contour.removePoint(contour[-1])
-        self.contour = None
 
     # ╭──────────────╮
     # │ DRAW METHODS │

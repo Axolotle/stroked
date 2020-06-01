@@ -97,7 +97,7 @@ class SelectTool(BaseTool):
     # │ TOOL METHODS │
     # ╰──────────────╯
 
-    def reset(self, canvas):
+    def reset(self):
         self.selection = None
         self.select_rect = None
         self.drag_origin = (0, 0)

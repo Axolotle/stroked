@@ -22,7 +22,7 @@ class BaseTool():
     # │ TOOL METHODS │
     # ╰──────────────╯
 
-    def reset(self, canvas):
+    def reset(self):
         pass
 
     # ╭──────────────╮
