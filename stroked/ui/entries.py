@@ -83,4 +83,4 @@ class HexEntry(CustomEntry, Gtk.Entry, Gtk.Editable):
     def set_value(self, values):
         self.set_text(' '.join(
             [hex(value) for value in values]
-        ).replace('x', '0'))
+        ).replace('x', '0').upper())
