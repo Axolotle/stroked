@@ -11,6 +11,7 @@ class StrokedWindow(Gtk.ApplicationWindow):
     tabs = Gtk.Template.Child('tabs')
     masters_store = Gtk.Template.Child('masters-store')
     masters_selection = Gtk.Template.Child('masters-selection')
+    glyph_infos = Gtk.Template.Child('glyph-infos')
 
     def __init__(self, app, font, filename='Untitled', font_path=None):
         title = '{} - Stroked'.format(filename)
@@ -42,6 +43,8 @@ class StrokedWindow(Gtk.ApplicationWindow):
             self, 'on_master_deleted', 'LayerSet.LayerDeleted')
         self.font.layers.addObserver(
             self, 'on_master_renamed', 'LayerSet.LayerNameChanged')
+
+        self.current_glyph = None
 
     # ╭──────────────────────╮
     # │ GTK ACTIONS HANDLERS │
@@ -120,8 +123,11 @@ class StrokedWindow(Gtk.ApplicationWindow):
             curr_canvas.glyph = self.font.active_master[curr_canvas.glyph.name]
 
     def on_current_glyph_changed(self, tabs, canvas, glyph_name):
+        glyph = self.font.active_master[glyph_name]
         canvas._tool = self.toolbar.current_tool
-        canvas.glyph = self.font.active_master[glyph_name]
+        canvas.glyph = glyph
+        self.glyph_infos.set_current_glyph(glyph)
+        self.current_glyph = glyph
 
     def on_current_tool_changed(self, widget, tool):
         curr_canvas = self.tabs.active_canvas

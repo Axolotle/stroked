@@ -4,10 +4,11 @@ from .tabs import Tabs
 from .glyph_list import GlyphList
 from .toolbar import Toolbar
 from .dialogs import DialogAskSave, WindowFontInfo
+from .panels import GlyphInfos
 
 
 __all__ = [
     'TextEntry', 'FloatEntry', 'HexEntry',
     'Canvas', 'Tabs', 'GlyphList', 'Toolbar', 'DialogAskSave',
-    'WindowFontInfo',
+    'WindowFontInfo', 'GlyphInfos'
 ]

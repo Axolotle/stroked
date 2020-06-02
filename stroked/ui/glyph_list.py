@@ -1,3 +1,5 @@
+import weakref
+
 from gi.repository import Gtk
 
 
@@ -20,7 +22,7 @@ class GlyphList(Gtk.FlowBox):
     def display_glyphs(self, widget):
         glyph_names = self.font.glyphOrder
         for name in glyph_names:
-            self.add(GlyphItem(name))
+            self.add(GlyphItem(name, self.font.active_master[name]))
         self.show_all()
 
     # ╭─────────────────────╮
@@ -36,7 +38,18 @@ class GlyphList(Gtk.FlowBox):
 class GlyphItem(Gtk.FlowBoxChild):
     __gtype_name__ = 'GlyphItem'
 
-    def __init__(self, label):
+    def __init__(self, label, glyph):
         super().__init__()
         self.set_size_request(60, 75)
         self.add(Gtk.Label(label=label))
+        self._glyph = weakref.ref(glyph)
+        glyph.addObserver(self, 'on_glyph_name_changed', 'Glyph.NameChanged')
+
+    @property
+    def glyph(self):
+        return self._glyph()
+
+    def on_glyph_name_changed(self, notification):
+        old_name, new_name = notification.data.values()
+        self.get_child().set_label(new_name)
+        self.get_parent().tabs.rename_tab(old_name, new_name)

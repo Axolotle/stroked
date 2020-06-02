@@ -44,10 +44,12 @@ class Tabs(Gtk.Notebook):
         self.show_all()
         return index
 
-    def rename_tab(self, index, name):
-        tab = self.get_nth_page(index)
-        label_widget = self.get_tab_label(tab).get_children()[0]
-        label_widget.set_label(name)
+    def rename_tab(self, old_label_text, new_label_text):
+        index = self.get_tab_index_from_label(old_label_text)
+        if index is not None:
+            tab = self.get_nth_page(index)
+            label_widget = self.get_tab_label(tab).get_children()[0]
+            label_widget.set_label(new_label_text)
 
     def open_tab(self, label_text):
         index = self.get_tab_index_from_label(label_text)

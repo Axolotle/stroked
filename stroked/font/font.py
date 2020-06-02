@@ -70,6 +70,7 @@ class Font(DefFont):
             name = chr(uni)
             glyph = base_master.newGlyph(name)
             glyph.unicodes = [uni]
+            glyph.width = self.slib['gridWidth']
             glyph_order.append(name)
         self.glyphOrder = glyph_order
 
