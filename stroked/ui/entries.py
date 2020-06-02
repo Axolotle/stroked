@@ -45,15 +45,15 @@ class FloatEntry(CustomEntry, Gtk.Entry, Gtk.Editable):
         'safe_value_changed': (GObject.SIGNAL_RUN_FIRST, None, (float, ))
     }
 
-    def do_insert_text(self, new_text, length, position):
+    def do_insert_text(self, new_text, length, pos):
         text = self.get_text()
-        parsed_value = self.get_value(text + new_text)
+        parsed_value = self.get_value(text[0:pos] + new_text + text[pos:])
 
         if parsed_value is None:
-            return position
+            return pos
         else:
-            self.get_buffer().insert_text(position, new_text, length)
-            return position + length
+            self.get_buffer().insert_text(pos, new_text, length)
+            return pos + length
 
     def get_value(self, value=None):
         try:
