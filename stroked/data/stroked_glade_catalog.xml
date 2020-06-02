@@ -2,6 +2,10 @@
  <init-function>glade_python_init</init-function>
 
  <glade-widget-classes>
+   <glade-widget-class title="TextEntry" name="TextEntry" generic-name="textentry" parent="GtkEntry"/>
+   <glade-widget-class title="FloatEntry" name="FloatEntry" generic-name="floatentry" parent="GtkEntry"/>
+   <glade-widget-class title="HexEntry" name="HexEntry" generic-name="hexentry" parent="GtkEntry"/>
+
    <glade-widget-class title="StrokedWindow" name="StrokedWindow" generic-name="strokedwindow" parent="GtkApplicationWindow"/>
    <glade-widget-class title="Tabs" name="Tabs" generic-name="tabs" parent="GtkNotebook"/>
    <glade-widget-class title="GlyphList" name="GlyphList" generic-name="glyphlist" parent="GtkFlowBox"/>
@@ -13,9 +17,12 @@
    <glade-widget-class title="WindowFontInfo" name="WindowFontInfo" generic-name="windowfontinfo" parent="GtkWindow"/>
    <glade-widget-class title="MasterStackItem" name="MasterStackItem" generic-name="masterstackitem" parent="GtkBox"/>
    <glade-widget-class title="InstanceStackItem" name="InstanceStackItem" generic-name="instancestackitem" parent="GtkBox"/>
+   <glade-widget-class title="GlyphInfos" name="GlyphInfos" generic-name="glyphinfos" parent="GtkGrid"/>
  </glade-widget-classes>
 
  <glade-widget-group name="stroked" title="Stroked">
+   <glade-widget-class-ref name="FloatEntry"/>
+
    <glade-widget-class-ref name="StrokedWindow"/>
    <glade-widget-class-ref name="Tabs"/>
    <glade-widget-class-ref name="GlyphList"/>
@@ -27,5 +34,6 @@
    <glade-widget-class-ref name="WindowFontInfo"/>
    <glade-widget-class-ref name="MasterStackItem"/>
    <glade-widget-class-ref name="InstanceStackItem"/>
+   <glade-widget-class-ref name="GlyphInfos"/>
  </glade-widget-group>
 </glade-catalog>
