@@ -17,10 +17,9 @@ class SelectTool(BaseTool):
     # ╰─────────────────────╯
 
     def on_mouse_press(self, canvas, event):
-        pos = canvas.mouse_pos
-        glyph = canvas.glyph
-
         if event.button == Gdk.BUTTON_PRIMARY:
+            pos = canvas.mouse_pos
+            glyph = canvas.glyph
             self.drag_origin = pos
             locked_pos = round_point(pos)
             point, contour = find_point_in_glyph(glyph, locked_pos)
@@ -48,7 +47,7 @@ class SelectTool(BaseTool):
                     for contour in reversed(glyph):
                         index = contour.get_pos_on_path(pos)
                         if index is not None:
-                            point = contour.insert_point(index, locked_pos)
+                            point = contour.insert_new_point(index, locked_pos)
                             self.selection = set()
                             self.selection.add(point)
                             self.select_rect = None
@@ -60,19 +59,20 @@ class SelectTool(BaseTool):
             if self.select_rect is not None:
                 self.select_rect = (self.select_rect[0], (x, y))
             else:
-                x, y = round_point(canvas.mouse_pos)
+                glyph = canvas.glyph
+                x, y = round_point((x, y))
                 dx, dy = round_point(self.drag_origin)
                 translation = (x - dx, y - dy)
-                self.move_selection(self.selection, translation)
+                glyph.selection = self.selection
+                if translation != (0, 0):
+                    glyph.move_selected(translation)
                 self.drag_origin = (x, y)
-                canvas.glyph.selection = self.selection
 
     def on_mouse_release(self, canvas, event):
-        modifier = event.state & Gdk.ModifierType.SHIFT_MASK
-        glyph = canvas.glyph
-
         if event.button == Gdk.BUTTON_PRIMARY:
+            glyph = canvas.glyph
             if self.select_rect is not None:
+                modifier = event.state & Gdk.ModifierType.SHIFT_MASK
                 selection = glyph.selection if modifier else set()
                 points = self.get_points_in_rect(glyph, self.select_rect)
                 selection.update(points)
@@ -80,7 +80,6 @@ class SelectTool(BaseTool):
                 selection = self.selection
             glyph.selection = selection
             self.select_rect = None
-            self.selection = None
 
     def on_key_press(self, canvas, event):
         translations = {
@@ -91,13 +90,16 @@ class SelectTool(BaseTool):
         }
         key = Gdk.keyval_name(event.keyval)
         if key in translations:
-            self.move_selection(canvas.glyph.selection, translations[key])
+            canvas.glyph.move_selected(translations[key])
 
     # ╭──────────────╮
     # │ TOOL METHODS │
     # ╰──────────────╯
 
     def reset(self):
+        if self.selection is not None:
+            for point in self.selection:
+                point.selected = False
         self.selection = None
         self.select_rect = None
         self.drag_origin = (0, 0)
@@ -115,10 +117,6 @@ class SelectTool(BaseTool):
                 if sx < x < ex and sy < y < ey:
                     points.add(point)
         return points
-
-    def move_selection(self, selection, translation):
-        for point in selection:
-            point.move(translation)
 
     # ╭──────────────╮
     # │ DRAW METHODS │
