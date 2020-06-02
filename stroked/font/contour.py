@@ -65,3 +65,9 @@ class Contour(DefContour):
         for point in contour:
             self.appendPoint(point)
         contour.glyph.removeContour(contour)
+
+    def move_selected(self, values):
+        for point in self.selection:
+            point.move(values)
+        self.postNotification('Contour.PointsChanged')
+        self.dirty = True

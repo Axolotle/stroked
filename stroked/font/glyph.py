@@ -28,3 +28,7 @@ class Glyph(DefGlyph):
     def selection(self, selection):
         for contour in self:
             contour.selection = selection
+
+    def move_selected(self, values):
+        for contour in self:
+            contour.move_selected(values)
