@@ -3,7 +3,7 @@ import signal
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gio, Gtk
+from gi.repository import Gio, Gtk, GLib
 
 from fontTools.ufoLib.errors import UFOLibError
 
@@ -13,15 +13,28 @@ from stroked.window import StrokedWindow
 
 
 class Stroked(Gtk.Application):
-    def __init__(self):
-        super().__init__(application_id='space.autre.stroked',
-                         flags=Gio.ApplicationFlags.FLAGS_NONE)
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            *args,
+            application_id='space.autre.stroked',
+            flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
+            **kwargs
+        )
+
+        # Command line arguments definitions
+        self.add_main_option(
+            'ufo',
+            0,
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.STRING,
+            'Export all instances of given stk font as UFO files in FOLDER',
+            'FOLDER',
+        )
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
         # allow forced shutdown to quit silently
         signal.signal(signal.SIGINT, signal.SIG_DFL)
-
         self.set_actions()
 
     def do_activate(self):
@@ -30,7 +43,33 @@ class Stroked(Gtk.Application):
             self.on_new(None, None)
 
     def do_command_line(self, command_line):
-        pass
+        args = command_line.get_arguments()[1:]
+        options = command_line.get_options_dict()
+        # convert GVariantDict -> GVariant -> dict
+        options = options.end().unpack()
+        if len(args) == 0:
+            self.activate()
+            if options:
+                print('*Warning* Arguments ignored, missing file reference')
+        else:
+            path = args[0]
+            try:
+                font = Font(path=path)
+            except UFOLibError:
+                print('*Error*, Invalid UFO folder for {}'.format(path))
+                return 1
+            if options:
+                for option_name, dest_path in options.items():
+                    font.export(option_name, {
+                        'instances': font.instances.keys(),
+                        'folder': dest_path
+                    })
+                return 1
+            else:
+                filename = os.path.split(path)[-1]
+                window = StrokedWindow(self, font, filename, path)
+                window.present()
+        return 0
 
     def set_actions(self):
         actions = [
