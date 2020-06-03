@@ -63,7 +63,7 @@ class DialogExport(Gtk.Dialog):
             raise ValueError('Destination is None')
         return {
             'masters': self.get_selected_masters(),
-            'path': path,
+            'folder': path,
         }
 
     def get_selected_masters(self):
