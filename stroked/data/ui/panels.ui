@@ -46,7 +46,7 @@
       </object>
       <packing>
         <property name="left_attach">0</property>
-        <property name="top_attach">2</property>
+        <property name="top_attach">3</property>
       </packing>
     </child>
     <child>
@@ -70,7 +70,7 @@
       </object>
       <packing>
         <property name="left_attach">0</property>
-        <property name="top_attach">3</property>
+        <property name="top_attach">4</property>
       </packing>
     </child>
     <child>
@@ -83,7 +83,7 @@
       </object>
       <packing>
         <property name="left_attach">2</property>
-        <property name="top_attach">3</property>
+        <property name="top_attach">4</property>
       </packing>
     </child>
     <child>
@@ -106,7 +106,7 @@
       </object>
       <packing>
         <property name="left_attach">1</property>
-        <property name="top_attach">3</property>
+        <property name="top_attach">4</property>
       </packing>
     </child>
     <child>
@@ -117,11 +117,35 @@
       </object>
       <packing>
         <property name="left_attach">3</property>
-        <property name="top_attach">3</property>
+        <property name="top_attach">4</property>
       </packing>
     </child>
     <child>
       <object class="FloatEntry" id="glyph-width-entry">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+      </object>
+      <packing>
+        <property name="left_attach">1</property>
+        <property name="top_attach">3</property>
+        <property name="width">3</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Characters</property>
+        <property name="single_line_mode">True</property>
+        <property name="xalign">1</property>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
+        <property name="top_attach">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="CharToHexEntry" id="glyph-characters-entry">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
       </object>

@@ -7,6 +7,7 @@ class GlyphInfos(Gtk.Grid):
 
     entry_name = Gtk.Template.Child('glyph-name-entry')
     entry_unicodes = Gtk.Template.Child('glyph-unicodes-entry')
+    entry_characters = Gtk.Template.Child('glyph-characters-entry')
     entry_width = Gtk.Template.Child('glyph-width-entry')
     entry_leftMargin = Gtk.Template.Child('glyph-left-entry')
     entry_rightMargin = Gtk.Template.Child('glyph-right-entry')
@@ -25,17 +26,26 @@ class GlyphInfos(Gtk.Grid):
 
     def on_value_changed(self, entry, value, attr):
         if self._glyph is not None:
-            setattr(self._glyph, attr, value)
+            if attr == 'rightMargin':
+                value += 1
+            if attr == 'characters':
+                setattr(self._glyph, 'unicodes', value)
+            else:
+                setattr(self._glyph, attr, value)
 
     def update_attributes(self, glyph):
-        for attr in ('name', 'unicodes', 'width', 'leftMargin', 'rightMargin'):
+        for attr in ('name', 'unicodes', 'width', 'leftMargin'):
             getattr(self, 'entry_' + attr).set_value(getattr(glyph, attr))
+        right_margin = glyph.rightMargin - 1 if glyph.rightMargin is not None else None
+        self.entry_rightMargin.set_value(right_margin)
+        self.entry_characters.set_value(glyph.unicodes)
 
     def on_glyph_changed(self, notification):
         glyph = self._glyph
         self.entry_width.set_value(glyph.width)
         self.entry_leftMargin.set_value(glyph.leftMargin)
-        self.entry_rightMargin.set_value(glyph.rightMargin)
+        right_margin = glyph.rightMargin - 1 if glyph.rightMargin is not None else None
+        self.entry_rightMargin.set_value(right_margin)
 
     def _unsubscribe_to_glyph(self):
         if self._glyph is None:
