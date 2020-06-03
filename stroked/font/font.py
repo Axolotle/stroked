@@ -140,6 +140,8 @@ class Font(DefFont):
                 font.info.styleName = data['style_name']
                 font.lib.setDataFromSerialization(lib)
                 for glyph in master:
+                    if len(glyph) < 1:
+                        continue
                     new_glyph = font.newGlyph(glyph.name)
                     new_glyph.unicodes = glyph.unicodes
                     out_pen = ContourOffsetPointPen(
@@ -150,6 +152,8 @@ class Font(DefFont):
                         linejoin=data['linejoin'],
                     )
                     glyph.drawPoints(out_pen)
+                    new_glyph.leftMargin = glyph.leftMargin
+                    new_glyph.width = glyph.width
                 filename = '{}-{}.ufo'.format(
                     infos['familyName'], data['style_name']
                 ).replace(' ', '').lower()
