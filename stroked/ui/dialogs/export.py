@@ -10,7 +10,7 @@ class DialogExport(Gtk.Dialog):
     notebook = Gtk.Template.Child('export-notebook')
 
     # Common elements
-    instances_list = Gtk.Template.Child('instances-list')
+    masters_list = Gtk.Template.Child('masters-list')
 
     # OTF panel
     ttf_checkbox = Gtk.Template.Child('ttf-checkbox')
@@ -23,15 +23,15 @@ class DialogExport(Gtk.Dialog):
         super().__init__(title='Export ' + window.filename,
                          transient_for=window)
 
-        instances = window.font.instances
-        for name in instances:
+        masters = window.font.masters
+        for master in masters:
             row = Gtk.ListBoxRow()
             row.set_can_focus(False)
-            checkbox = Gtk.CheckButton.new_with_label(name)
+            checkbox = Gtk.CheckButton.new_with_label(master.name.split('.')[-1])
             checkbox.set_active(True)
             row.add(checkbox)
-            self.instances_list.add(row)
-        self.instances_list.show_all()
+            self.masters_list.add(row)
+        self.masters_list.show_all()
 
         self.otf_destination.set_current_folder(
             os.path.expanduser('~/.local/share/fonts/'))
@@ -52,7 +52,7 @@ class DialogExport(Gtk.Dialog):
 
     def parse_options_otf(self):
         return {
-            'instances': self.get_selected_instances(),
+            'masters': self.get_selected_masters(),
             'ttf': self.ttf_checkbox.get_active(),
             'path': self.otf_destination.get_filename(),
         }
@@ -62,13 +62,13 @@ class DialogExport(Gtk.Dialog):
         if path is None:
             raise ValueError('Destination is None')
         return {
-            'instances': self.get_selected_instances(),
+            'masters': self.get_selected_masters(),
             'path': path,
         }
 
-    def get_selected_instances(self):
+    def get_selected_masters(self):
         names = []
-        for row in self.instances_list.get_children():
+        for row in self.masters_list.get_children():
             checkbox = row.get_child()
             if checkbox.get_active():
                 names.append(checkbox.get_label())
@@ -82,7 +82,7 @@ class DialogExport(Gtk.Dialog):
     def _on_page_switch(self, tabs, tab, num):
         if num > 1:
             return
-        list = self.instances_list
+        list = self.masters_list
         next_container = tab.get_children()[0].get_children()[1]
         prev_container = list.get_parent()
         prev_container.remove(list)
