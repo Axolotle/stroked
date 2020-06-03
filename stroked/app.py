@@ -30,6 +30,14 @@ class Stroked(Gtk.Application):
             'Export all instances of given stk font as UFO files in FOLDER',
             'FOLDER',
         )
+        self.add_main_option(
+            'otf',
+            0,
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.STRING,
+            'Export all instances of given stk font as OTF font files',
+            'FOLDER',
+        )
 
     def do_startup(self):
         Gtk.Application.do_startup(self)

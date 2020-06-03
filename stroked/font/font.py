@@ -126,6 +126,7 @@ class Font(DefFont):
 
     def export(self, format_type, options):
         from stroked.pens.stroked_point_pen import ContourOffsetPointPen
+        from ufo2ft import compileOTF
 
         if format_type not in ('otf', 'ufo'):
             return
@@ -159,12 +160,13 @@ class Font(DefFont):
                     glyph.drawPoints(out_pen)
                     new_glyph.width = glyph.width
 
+                filename = '{}-{}.{}'.format(
+                    info['familyName'], info['styleName'], format_type
+                ).replace(' ', '').lower()
                 if format_type == 'otf':
-                    pass
+                    otf = compileOTF(font)
+                    otf.save(os.path.join(options['folder'], filename))
                 elif format_type == 'ufo':
-                    filename = '{}-{}.ufo'.format(
-                        info['familyName'], info['styleName']
-                    ).replace(' ', '').lower()
                     font.save(path=os.path.join(options['folder'], filename))
 
     def get_master_as_source(self, master, scale=100):
