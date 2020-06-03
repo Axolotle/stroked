@@ -1,4 +1,4 @@
-from .entries import TextEntry, FloatEntry, HexEntry
+from .entries import TextEntry, FloatEntry, HexEntry, CharToHexEntry
 from .canvas import Canvas
 from .tabs import Tabs
 from .glyph_list import GlyphList
@@ -8,7 +8,7 @@ from .panels import GlyphInfos
 
 
 __all__ = [
-    'TextEntry', 'FloatEntry', 'HexEntry',
+    'TextEntry', 'FloatEntry', 'HexEntry', 'CharToHexEntry',
     'Canvas', 'Tabs', 'GlyphList', 'Toolbar', 'DialogAskSave',
     'WindowFontInfo', 'GlyphInfos'
 ]

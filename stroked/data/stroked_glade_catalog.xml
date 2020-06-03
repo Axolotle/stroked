@@ -5,6 +5,7 @@
    <glade-widget-class title="TextEntry" name="TextEntry" generic-name="textentry" parent="GtkEntry"/>
    <glade-widget-class title="FloatEntry" name="FloatEntry" generic-name="floatentry" parent="GtkEntry"/>
    <glade-widget-class title="HexEntry" name="HexEntry" generic-name="hexentry" parent="GtkEntry"/>
+   <glade-widget-class title="CharToHexEntry" name="CharToHexEntry" generic-name="chartohexentry" parent="GtkEntry"/>
 
    <glade-widget-class title="StrokedWindow" name="StrokedWindow" generic-name="strokedwindow" parent="GtkApplicationWindow"/>
    <glade-widget-class title="Tabs" name="Tabs" generic-name="tabs" parent="GtkNotebook"/>
@@ -21,8 +22,10 @@
  </glade-widget-classes>
 
  <glade-widget-group name="stroked" title="Stroked">
+   <glade-widget-class-ref name="TextEntry"/>
    <glade-widget-class-ref name="FloatEntry"/>
-
+   <glade-widget-class-ref name="HexEntry"/>
+   <glade-widget-class-ref name="CharToHexEntry"/>
    <glade-widget-class-ref name="StrokedWindow"/>
    <glade-widget-class-ref name="Tabs"/>
    <glade-widget-class-ref name="GlyphList"/>

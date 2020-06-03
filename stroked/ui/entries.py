@@ -47,9 +47,10 @@ class FloatEntry(CustomEntry, Gtk.Entry, Gtk.Editable):
 
     def do_insert_text(self, new_text, length, pos):
         text = self.get_text()
-        parsed_value = self.get_value(text[0:pos] + new_text + text[pos:])
+        full_text = text[0:pos] + new_text + text[pos:]
+        parsed_value = self.get_value(full_text)
 
-        if parsed_value is None:
+        if parsed_value is None and full_text != '-':
             return pos
         else:
             self.get_buffer().insert_text(pos, new_text, length)
@@ -76,7 +77,7 @@ class HexEntry(CustomEntry, Gtk.Entry, Gtk.Editable):
         if values is None:
             values = self.get_text()
         try:
-            return [int(value, 16) for value in values.split(' ')]
+            return [int(value, 16) for value in values.strip().split(' ')]
         except ValueError:
             return None
 
@@ -84,3 +85,24 @@ class HexEntry(CustomEntry, Gtk.Entry, Gtk.Editable):
         self.set_text(' '.join(
             [hex(value) for value in values]
         ).replace('x', '0').upper())
+
+
+class CharToHexEntry(CustomEntry, Gtk.Entry, Gtk.Editable):
+    __gtype_name__ = 'CharToHexEntry'
+
+    __gsignals__ = {
+        'safe_value_changed': (GObject.SIGNAL_RUN_FIRST, None, (object, ))
+    }
+
+    def get_value(self, values=None):
+        if values is None:
+            values = self.get_text()
+        try:
+            return [hex(ord(value)) for value in values.strip().split(' ')]
+        except ValueError:
+            return None
+
+    def set_value(self, values):
+        self.set_text(' '.join(
+            [chr(value) for value in values]
+        ))
