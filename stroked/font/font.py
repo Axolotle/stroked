@@ -37,6 +37,10 @@ class Font(DefFont):
         self._active_master_name = name
 
     @property
+    def masters(self):
+        return self._layers
+
+    @property
     def instances(self):
         return self.slib['instances']
 
@@ -122,39 +126,81 @@ class Font(DefFont):
         instances.pop(name)
 
     def export(self, format_type, options):
-        if format_type == 'otf':
-            pass
-        elif format_type == 'ufo':
-            from stroked.pens.stroked_point_pen import ContourOffsetPointPen
-            instances, folder = options.values()
-            infos = self.info.getDataForSerialization()
-            lib = self.lib.getDataForSerialization()
-            # Remove specific part of the lib
-            del lib['space.autre.stroked']
+        from stroked.pens.stroked_point_pen import ContourOffsetPointPen
 
-            for name in instances:
-                data = self.instances[name]
-                master = self._layers[data['master']]
+        if format_type not in ('otf', 'ufo'):
+            return
+        scale = 100
+        for master_name in options['masters']:
+            source = self.get_master_as_source(
+                self._layers['master.' + master_name], scale=scale
+            )
+            for instance_data in self.instances.values():
                 font = DefFont()
-                font.info.setDataFromSerialization(infos)
-                font.info.styleName = data['style_name']
+                info = dict(source['info'])
+                lib = dict(source['lib'])
+
+                info['styleName'] = instance_data['style_name']
+                info['openTypeOS2WeightClass'] = instance_data['weight']
+                info['openTypeOS2WidthClass'] = instance_data['width']
+
+                font.info.setDataFromSerialization(info)
                 font.lib.setDataFromSerialization(lib)
-                for glyph in master:
-                    if len(glyph) < 1:
-                        continue
+
+                for glyph in source['font']:
                     new_glyph = font.newGlyph(glyph.name)
                     new_glyph.unicodes = glyph.unicodes
                     out_pen = ContourOffsetPointPen(
                         new_glyph.getPen(),
-                        linewidth=data['linewidth'],
-                        linecap=data['linecap'],
-                        pointcap=data['single_point'],
-                        linejoin=data['linejoin'],
+                        linewidth=instance_data['linewidth'] * scale,
+                        linecap=instance_data['linecap'],
+                        pointcap=instance_data['single_point'],
+                        linejoin=instance_data['linejoin'],
                     )
                     glyph.drawPoints(out_pen)
-                    new_glyph.leftMargin = glyph.leftMargin
                     new_glyph.width = glyph.width
-                filename = '{}-{}.ufo'.format(
-                    infos['familyName'], data['style_name']
-                ).replace(' ', '').lower()
-                font.save(path=os.path.join(folder, filename))
+
+                if format_type == 'otf':
+                    pass
+                elif format_type == 'ufo':
+                    filename = '{}-{}.ufo'.format(
+                        info['familyName'], info['styleName']
+                    ).replace(' ', '').lower()
+                    font.save(path=os.path.join(options['folder'], filename))
+
+    def get_master_as_source(self, master, scale=100):
+        """
+        Returns a copy of a master as a defcon Font object.
+        The font is scaled and coordinates are converted with UFO origin.
+        Some generic attributes from self.lib, self.info and master.lib are
+        also added.
+        """
+        from fontTools.pens.transformPen import TransformPointPen
+        from fontTools.misc.transform import Transform
+
+        info = self.info.getDataForSerialization()
+        lib = self.lib.getDataForSerialization()
+        master_lib = master.lib['space.autre.stroked']
+        del lib['space.autre.stroked']
+
+        font = DefFont()
+        for attr in ('ascender', 'capHeight', 'xHeight', 'descender'):
+            info[attr] = master_lib[attr] * scale
+        info['unitsPerEm'] = info['ascender'] + abs(info['descender'])
+
+        transformation = Transform(scale, 0, 0, -scale,
+                                   0.5 * scale, info['ascender'] - 0.5 * scale)
+
+        for glyph in master:
+            new_glyph = font.newGlyph(glyph.name)
+            new_glyph.unicodes = glyph.unicodes
+            new_glyph.width = glyph.width * scale
+            point_pen = new_glyph.getPointPen()
+            transform_pen = TransformPointPen(point_pen, transformation)
+            glyph.drawPoints(transform_pen)
+
+        return {
+            'font': font,
+            'info': info,
+            'lib': lib,
+        }

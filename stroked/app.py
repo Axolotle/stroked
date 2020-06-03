@@ -61,7 +61,8 @@ class Stroked(Gtk.Application):
             if options:
                 for option_name, dest_path in options.items():
                     font.export(option_name, {
-                        'instances': font.instances.keys(),
+                        'masters': [master.name.split('.')[-1]
+                                    for master in font.masters],
                         'folder': dest_path
                     })
                 return 1
