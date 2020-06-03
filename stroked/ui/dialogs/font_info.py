@@ -272,8 +272,6 @@ class StackItemMaster(Gtk.Box):
 class StackItemInstance(Gtk.Box):
     __gtype_name__ = 'StackItemInstance'
 
-    master = Gtk.Template.Child('master-combo')
-
     style_name = Gtk.Template.Child('stylename-entry')
     weight = Gtk.Template.Child('weight-combo')
     width = Gtk.Template.Child('width-combo')
@@ -293,8 +291,6 @@ class StackItemInstance(Gtk.Box):
         self.name = name
         self.data = data
 
-        for layer in font._layers:
-            self.master.append(layer.name, layer.name)
         for name in font.slib['instances'].keys():
             self.related_instance.append(name, name)
 

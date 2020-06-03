@@ -107,7 +107,6 @@ class Font(DefFont):
     def add_instance(self, name='New Instance'):
         instances = self.slib['instances']
         instances[name] = {
-            'master': self._layers.defaultLayer.name.split('.')[-1],
             'style_name': name,
             'weight': 400,
             'width': 5,
