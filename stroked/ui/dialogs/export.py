@@ -39,21 +39,18 @@ class DialogExport(Gtk.Dialog):
         self.ufo_destination.set_current_folder(
             current_path or os.path.expanduser('~'))
 
-    @property
-    def active_tab(self):
-        notebook = self.notebook
-        return notebook.get_nth_page(notebook.get_current_page())
-
     def get_options(self):
         notebook = self.notebook
-        tab = self.active_tab
-        format = notebook.get_tab_label_text(tab)
-        return format, getattr(self, 'parse_options_' + format)()
+        current_tab = notebook.get_nth_page(notebook.get_current_page())
+        format = notebook.get_tab_label_text(current_tab)
+        parsed_options = getattr(self, 'parse_options_' + format)()
+        return parsed_options
 
     def parse_options_otf(self):
+        ttf = self.ttf_checkbox.get_active()
         return {
+            'format': 'ttf' if ttf else 'otf',
             'masters': self.get_selected_masters(),
-            'ttf': self.ttf_checkbox.get_active(),
             'path': self.otf_destination.get_filename(),
         }
 
@@ -62,8 +59,9 @@ class DialogExport(Gtk.Dialog):
         if path is None:
             raise ValueError('Destination is None')
         return {
+            'format': 'ufo',
             'masters': self.get_selected_masters(),
-            'folder': path,
+            'path': path,
         }
 
     def get_selected_masters(self):
@@ -71,7 +69,7 @@ class DialogExport(Gtk.Dialog):
         for row in self.masters_list.get_children():
             checkbox = row.get_child()
             if checkbox.get_active():
-                names.append(checkbox.get_label())
+                names.append('master.' + checkbox.get_label())
         return names
 
     @Gtk.Template.Callback('on_delete')

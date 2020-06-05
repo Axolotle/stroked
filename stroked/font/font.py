@@ -38,7 +38,7 @@ class Font(DefFont):
 
     @property
     def masters(self):
-        return self._layers
+        return [layer for layer in self._layers if 'master.' in layer.name]
 
     @property
     def instances(self):
@@ -124,17 +124,22 @@ class Font(DefFont):
         instances = self.slib['instances']
         instances.pop(name)
 
-    def export(self, format_type, options):
+    def export(self, path, format_type, masters=None):
         from stroked.pens.stroked_point_pen import ContourOffsetPointPen
-        from ufo2ft import compileOTF
+        from ufo2ft import compileOTF, compileTTF
 
-        if format_type not in ('otf', 'ufo'):
-            return
+        format_types = ('otf', 'ttf', 'ufo')
+        if format_type not in format_types:
+            raise ValueError('Unknown format: {}'.format(format_type))
+        if not os.path.isdir(path):
+            raise OSError(2, os.strerror(2), path)
+
+        if masters is None:
+            masters = self.masters
+
         scale = 100
-        for master_name in options['masters']:
-            source = self.get_master_as_source(
-                self._layers['master.' + master_name], scale=scale
-            )
+        for master in masters:
+            source = self.get_master_as_source(master, scale=scale)
             for instance_data in self.instances.values():
                 font = DefFont()
                 info = dict(source['info'])
@@ -162,12 +167,13 @@ class Font(DefFont):
 
                 filename = '{}-{}.{}'.format(
                     info['familyName'], info['styleName'], format_type
-                ).replace(' ', '').lower()
-                if format_type == 'otf':
-                    otf = compileOTF(font)
-                    otf.save(os.path.join(options['folder'], filename))
+                ).replace(' ', '')
+                if format_type in ('otf', 'ttf'):
+                    func = compileOTF if format_type == 'otf' else compileTTF
+                    compiled = func(font)
+                    compiled.save(os.path.join(path, filename))
                 elif format_type == 'ufo':
-                    font.save(path=os.path.join(options['folder'], filename))
+                    font.save(path=os.path.join(path, filename))
 
     def get_master_as_source(self, master, scale=100):
         """

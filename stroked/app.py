@@ -23,20 +23,20 @@ class Stroked(Gtk.Application):
 
         # Command line arguments definitions
         self.add_main_option(
-            'ufo',
-            0,
+            'output',
+            ord('o'),
             GLib.OptionFlags.NONE,
             GLib.OptionArg.STRING,
-            'Export all instances of given stk font as UFO files in FOLDER',
+            'Export destination',
             'FOLDER',
         )
         self.add_main_option(
-            'otf',
-            0,
+            'format',
+            ord('f'),
             GLib.OptionFlags.NONE,
             GLib.OptionArg.STRING,
-            'Export all instances of given stk font as OTF font files',
-            'FOLDER',
+            'Export format, choose from [ufo, otf, tff]',
+            'FORMAT',
         )
 
     def do_startup(self):
@@ -58,22 +58,26 @@ class Stroked(Gtk.Application):
         if len(args) == 0:
             self.activate()
             if options:
-                print('*Warning* Arguments ignored, missing file reference')
+                print('*Warning* Arguments ignored, missing file input.')
         else:
             path = args[0]
             try:
                 font = Font(path=path)
             except UFOLibError:
-                print('*Error*, Invalid UFO folder for {}'.format(path))
+                print('Invalid UFO folder for {}'.format(path))
                 return 1
             if options:
-                for option_name, dest_path in options.items():
-                    font.export(option_name, {
-                        'masters': [master.name.split('.')[-1]
-                                    for master in font.masters],
-                        'folder': dest_path
-                    })
-                return 1
+                try:
+                    dest_path = options['output']
+                    format = options['format']
+                except KeyError as err:
+                    print('Missing argument: {}.'.format(err))
+                    return 1
+                try:
+                    font.export(dest_path, format)
+                except (OSError, ValueError) as err:
+                    print(err)
+                    return 1
             else:
                 filename = os.path.split(path)[-1]
                 window = StrokedWindow(self, font, filename, path)

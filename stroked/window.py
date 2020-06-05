@@ -70,7 +70,10 @@ class StrokedWindow(Gtk.ApplicationWindow):
         dialog = dialogs.DialogExport(self)
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            self.font.export(*dialog.get_options())
+            options = dialog.get_options()
+            options['masters'] = [self.font._layers[name]
+                                  for name in options['masters']]
+            self.font.export(options['path'], options['format'], options['masters'])
         dialog.destroy()
 
     # ╭─────────────────────╮
