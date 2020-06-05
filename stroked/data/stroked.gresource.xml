@@ -7,6 +7,7 @@
         <file preprocess="xml-stripblanks">ui/export_dialog.ui</file>
         <file preprocess="xml-stripblanks">ui/tabs.ui</file>
         <file preprocess="xml-stripblanks">ui/glyph_list.ui</file>
+        <file preprocess="xml-stripblanks">ui/glyph_item.ui</file>
         <file preprocess="xml-stripblanks">ui/font_info_window.ui</file>
         <file preprocess="xml-stripblanks">ui/master_stack_item.ui</file>
         <file preprocess="xml-stripblanks">ui/instance_stack_item.ui</file>
