@@ -77,6 +77,7 @@ class Canvas(Gtk.DrawingArea):
         ctx.scale(self.scale, self.scale)
 
         self.draw_guides(ctx, guides_x, guides_y)
+        self.draw_vertical_guides(ctx, glyph.width, (guides_y[0], guides_y[-1]))
         self.draw_grid(ctx, grid)
 
         ctx.set_source_rgba(1.0, 1.0, 1.0, 1.0)
@@ -111,6 +112,15 @@ class Canvas(Gtk.DrawingArea):
             ctx.move_to(guides_x[0], y)
             ctx.line_to(guides_x[1], y)
             ctx.stroke()
+
+    def draw_vertical_guides(self, ctx, width, height):
+        ctx.set_source_rgb(0.13, 0.3, 0.89)
+        ctx.set_line_width(1 / self.scale)  # 1px
+        ctx.move_to(-0.5, height[0] - 0.5)
+        ctx.line_to(-0.5, height[1] + 0.5)
+        ctx.move_to(width - 0.5, height[0] - 0.5)
+        ctx.line_to(width - 0.5, height[1] + 0.5)
+        ctx.stroke()
 
     def draw_points(self, ctx, glyph):
         selection = glyph.selection
