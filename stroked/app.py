@@ -7,19 +7,21 @@ from gi.repository import Gio, Gtk, GLib
 
 from fontTools.ufoLib.errors import UFOLibError
 
-import stroked.resources
 from stroked.font import Font
 from stroked.window import StrokedWindow
 
 
 class Stroked(Gtk.Application):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, version='', *args, **kwargs):
         super().__init__(
             *args,
             application_id='space.autre.stroked',
             flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
             **kwargs
         )
+        GLib.set_application_name('Stroked')
+        GLib.set_prgname('space.autre.stroked')
+        self.version = version
 
         # Command line arguments definitions
         self.add_main_option(
@@ -203,10 +205,10 @@ class Stroked(Gtk.Application):
         pass
 
 
-def main():
+def main(version=''):
     import sys
 
-    app = Stroked()
+    app = Stroked(version=version)
     exit_status = app.run(sys.argv)
     sys.exit(exit_status)
 
