@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Stroked
+Icon=space.autre.stroked
+Exec=stroked
+Terminal=false
+Type=Application
+Categories=
+StartupNotify=false

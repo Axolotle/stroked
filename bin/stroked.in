@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+
+from gi.repository import Gio
+
+
+VERSION = '@VERSION@'
+pkgdatadir = '@pkgdatadir@'
+srcdir = pkgdatadir
+
+sys.path.insert(1, srcdir)
+
+resource = Gio.resource_load(os.path.join(pkgdatadir, 'stroked.gresource'))
+Gio.Resource._register(resource)
+
+if __name__ == "__main__":
+    from stroked import app
+    
+    app.main(version=VERSION)

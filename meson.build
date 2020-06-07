@@ -1,0 +1,23 @@
+project('stroked',
+  version: '0.1.0',
+  meson_version: '>= 0.54.0',
+)
+
+python = import('python')
+# Module objects
+py_installation = python.find_installation('python3', modules:[
+    'defcon'
+])
+# Make sure Python is installed and found
+if not py_installation.found()
+    error('No valid python3 binary found')
+endif
+
+dependency('gtk+-3.0', version: '>= 3.24.7')
+dependency('pygobject-3.0', version: '>= 3.36.1')
+
+pkgdatadir = join_paths(get_option('datadir'), meson.project_name())
+
+install_subdir('stroked', install_dir: pkgdatadir)
+subdir('data')
+subdir('bin')
