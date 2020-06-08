@@ -4,27 +4,71 @@ An attempt to make a font drawing software with GTK.
 This software will be designed to draw stroke font (single-line font) and based on a restrictive pixel grid only.
 It will be possible to generate font files by providing the desired line thickness and I will try to find a solution to generate fonts that can be used by CNC/plotters.
 
-For now it can only be used as a python module.
+## BUILD
 
-## Setup
+I didn't quite understand what i was supposed to do so for now you can install this software by building it yourself after installing the following dependencies.
+
+### Run-time Dependencies
+- python3
+- python3-gi
+- python3-gi-cairo
+- gir1.2-gtk-3.0
+- python3-defcon
+- python3-ufo2ft
+
+### Build Dependencies
+- pkg-config
+- meson
+
+### Building
 
 ```bash
-# from the root of this repo
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# get the source files
+git clone https://github.com/Axolotle/stroked.git
+cd stroked/
 
-# from 'stroked/data/'
-glib-compile-resources stroked.gresource.xml
+# init meson
+meson _build
+# build the thing
+ninja -C _build
 ```
 
-## Run
+### Run without installing
 
 ```bash
-# from the root of this repo
-source venv/bin/activate
-python3 -m stroked
+# from your/path/to/stroked
+ninja -C _build run
+# or from your/path/to/stroked/_build
+ninja run
 ```
+
+### Installing
+
+```bash
+# from your/path/to/stroked
+sudo ninja -C _build install
+# or from your/path/to/stroked/_build
+sudo ninja install
+```
+
+### Run after installation
+```bash
+# from anywhere on the command line or from your launcher
+stroked
+```
+
+### Uninstall
+```bash
+# from your/path/to/stroked
+sudo ninja -C _build uninstall
+# or from your/path/to/stroked/_build
+sudo ninja uninstall
+```
+
+Files installed:
+- `stroked` folder with the python scripts in `/usr/local/share/`
+- `space.autre.stroked.desktop` file in `/usr/local/share/applications/`
+- `stroked` file script in `usr/local/bin/`
 
 ## Licence
 
