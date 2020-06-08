@@ -11,8 +11,10 @@ if not py_installation.found()
     error('No valid python3 binary found')
 endif
 
-dependency('gtk+-3.0', version: '>= 3.24.7')
-dependency('pygobject-3.0', version: '>= 3.36.1')
+# Don't understand what dependency are for if you have to install it yourself.
+# Will check later
+# dependency('gtk+-3.0', version: '>= 3.24.7')
+# dependency('pygobject-3.0', version: '>= 3.36.1')
 
 pkgdatadir = join_paths(get_option('datadir'), meson.project_name())
 
