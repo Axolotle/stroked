@@ -16,6 +16,18 @@ dependency('pygobject-3.0', version: '>= 3.36.1')
 
 pkgdatadir = join_paths(get_option('datadir'), meson.project_name())
 
-install_subdir('stroked', install_dir: pkgdatadir)
+install_subdir(
+    'stroked',
+    exclude_directories: [
+        '__pycache__',
+        'font/__pycache__',
+        'pens/__pycache__',
+        'tools/__pycache__',
+        'ui/__pycache__',
+        'ui/dialogs/__pycache__',
+        'ui/panels/__pycache__'
+    ],
+    install_dir: pkgdatadir
+)
 subdir('data')
 subdir('bin')
