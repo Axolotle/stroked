@@ -1,13 +1,11 @@
 project('stroked',
   version: '0.1.0',
-  meson_version: '>= 0.54.0',
+  meson_version: '>= 0.49.2',
 )
 
 python = import('python')
 # Module objects
-py_installation = python.find_installation('python3', modules:[
-    'defcon'
-])
+py_installation = python.find_installation('python3')
 # Make sure Python is installed and found
 if not py_installation.found()
     error('No valid python3 binary found')

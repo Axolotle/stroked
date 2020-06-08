@@ -9,6 +9,10 @@ from gi.repository import Gio
 VERSION = '@VERSION@'
 pkgdatadir = '@pkgdatadir@'
 srcdir = pkgdatadir
+builddir = os.environ.get('MESON_BUILD_ROOT')
+if builddir:
+    pkgdatadir = os.path.join(builddir, 'data')
+    srcdir = os.environ.get('MESON_SOURCE_ROOT')
 
 sys.path.insert(1, srcdir)
 
@@ -17,5 +21,5 @@ Gio.Resource._register(resource)
 
 if __name__ == "__main__":
     from stroked import app
-    
+
     app.main(version=VERSION)
