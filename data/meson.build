@@ -21,24 +21,3 @@ if desktop_utils.found()
     args: [stroked_desktop]
   )
 endif
-
-gtk_builder_tool = find_program('gtk-builder-tool', required: false)
-if gtk_builder_tool.found()
-  ui_files = [
-    ['ui', 'export_dialog.ui'],
-    ['ui', 'font_info_window.ui'],
-    ['ui', 'glyph_item.ui'],
-    ['ui', 'glyph_list.ui'],
-    ['ui', 'instance_stack_item.ui'],
-    ['ui', 'menubar.ui'],
-    ['ui', 'panels.ui'],
-    ['ui', 'simple_dialogs.ui'],
-    ['ui', 'tabs.ui'],
-    ['ui', 'window.ui'],
-  ]
-  foreach ui_file : ui_files
-    test('Validate @0@'.format(ui_file[1]), gtk_builder_tool,
-      args: ['validate', join_paths(meson.current_source_dir(), ui_file[0], ui_file[1])]
-    )
-  endforeach
-endif
