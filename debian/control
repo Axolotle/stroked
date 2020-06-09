@@ -1,0 +1,19 @@
+Source: stroked
+Section: graphics
+Priority: optional
+Maintainer: axolotle <contact@autre.space>
+Standards-Version: 4.5.0
+Homepage: https://stroked.autre.space
+Build-Depends: debhelper-compat (= 12), dh-python, meson (>= 0.49)
+
+Package: stroked
+Architecture: all
+Depends: ${python3:Depends},
+  ${misc:Depends},
+  python3-gi (>= 3.1),
+  python3-gi-cairo (>= 3.1),
+  gir1.2-gtk-3.0 (>= 3.12),
+  python3-defcon (>= 0.6),
+  python3-ufo2ft (>= 2.6)
+Description: stroked (single line) font editor
+  Stroked allows to draw single line fonts on a restrictive grid.
