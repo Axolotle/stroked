@@ -19,6 +19,9 @@ class DialogExport(Gtk.Dialog):
     # UFO panel
     ufo_destination = Gtk.Template.Child('ufo-destination')
 
+    # SVG panel
+    svg_destination = Gtk.Template.Child('svg-destination')
+
     def __init__(self, window):
         super().__init__(title='Export ' + window.filename,
                          transient_for=window)
@@ -37,6 +40,8 @@ class DialogExport(Gtk.Dialog):
             os.path.expanduser('~/.local/share/fonts/'))
         current_path = os.path.dirname(window.path) if window.path else None
         self.ufo_destination.set_current_folder(
+            current_path or os.path.expanduser('~'))
+        self.svg_destination.set_current_folder(
             current_path or os.path.expanduser('~'))
 
     def get_options(self):
@@ -64,6 +69,16 @@ class DialogExport(Gtk.Dialog):
             'path': path,
         }
 
+    def parse_options_svg(self):
+        path = self.svg_destination.get_filename()
+        if path is None:
+            raise ValueError('Destination is None')
+        return {
+            'format': 'svg',
+            'masters': self.get_selected_masters(),
+            'path': path,
+        }
+
     def get_selected_masters(self):
         names = []
         for row in self.masters_list.get_children():
@@ -78,7 +93,7 @@ class DialogExport(Gtk.Dialog):
 
     @Gtk.Template.Callback('on_page_switch')
     def _on_page_switch(self, tabs, tab, num):
-        if num > 1:
+        if num > 2:
             return
         list = self.masters_list
         next_container = tab.get_children()[0].get_children()[1]

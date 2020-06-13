@@ -125,10 +125,12 @@ class Font(DefFont):
         instances.pop(name)
 
     def export(self, path, format_type, masters=None):
-        from stroked.pens.stroked_point_pen import ContourOffsetPointPen
-        from ufo2ft import compileOTF, compileTTF
+        from ufo2ft import compileOTF as compile_OTF, compileTTF as compile_TTF
 
-        format_types = ('otf', 'ttf', 'ufo')
+        from stroked.converters.ufo2svg import compile_SVG
+        from stroked.pens.stroked_point_pen import ContourOffsetPointPen
+
+        format_types = ('otf', 'ttf', 'ufo', 'svg')
         if format_type not in format_types:
             raise ValueError('Unknown format: {}'.format(format_type))
         if not os.path.isdir(path):
@@ -140,6 +142,17 @@ class Font(DefFont):
         scale = 100
         for master in masters:
             source = self.get_master_as_source(master, scale=scale)
+
+            if format_type == 'svg':
+                font = source['font']
+                font.info.setDataFromSerialization(source['info'])
+                font.lib.setDataFromSerialization(source['lib'])
+                filename = '{}-{}.{}'.format(
+                    source['info']['familyName'], 'hershey', format_type
+                ).replace(' ', '')
+                compile_SVG(font, path=os.path.join(path, filename))
+                continue
+
             for instance_data in self.instances.values():
                 font = DefFont()
                 info = dict(source['info'])
@@ -169,7 +182,7 @@ class Font(DefFont):
                     info['familyName'], info['styleName'], format_type
                 ).replace(' ', '')
                 if format_type in ('otf', 'ttf'):
-                    func = compileOTF if format_type == 'otf' else compileTTF
+                    func = compile_OTF if format_type == 'otf' else compile_TTF
                     compiled = func(font)
                     compiled.save(os.path.join(path, filename))
                 elif format_type == 'ufo':
