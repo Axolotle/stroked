@@ -1,28 +1,28 @@
-<glade-catalog name="stroked" library="gladepython" domain="glade-3" depends="gtk+">
- <init-function>glade_python_init</init-function>
+<?xml version="1.0" encoding="UTF-8"?>
+<glade-catalog name="stroked" domain="glade-3" depends="gtk+" version="1.0">
 
  <glade-widget-classes>
-   <glade-widget-class title="TextEntry" name="TextEntry" generic-name="textentry" parent="GtkEntry"/>
-   <glade-widget-class title="FloatEntry" name="FloatEntry" generic-name="floatentry" parent="GtkEntry"/>
-   <glade-widget-class title="HexEntry" name="HexEntry" generic-name="hexentry" parent="GtkEntry"/>
-   <glade-widget-class title="CharToHexEntry" name="CharToHexEntry" generic-name="chartohexentry" parent="GtkEntry"/>
+   <glade-widget-class title="Text Entry" name="TextEntry" generic-name="textentry" parent="GtkEntry"/>
+   <glade-widget-class title="Float Entry" name="FloatEntry" generic-name="floatentry" parent="GtkEntry"/>
+   <glade-widget-class title="Hex Entry" name="HexEntry" generic-name="hexentry" parent="GtkEntry"/>
+   <glade-widget-class title="CharToHex Entry" name="CharToHexEntry" generic-name="chartohexentry" parent="GtkEntry"/>
 
-   <glade-widget-class title="StrokedWindow" name="StrokedWindow" generic-name="strokedwindow" parent="GtkApplicationWindow"/>
+   <glade-widget-class title="Stroked Window" name="StrokedWindow" generic-name="strokedwindow" parent="GtkApplicationWindow"/>
    <glade-widget-class title="Tabs" name="Tabs" generic-name="tabs" parent="GtkNotebook"/>
-   <glade-widget-class title="GlyphList" name="GlyphList" generic-name="glyphlist" parent="GtkFlowBox"/>
-   <glade-widget-class title="GlyphItem" name="GlyphItem" generic-name="glyphitem" parent="GtkFlowBoxChild"/>
+   <glade-widget-class title="Glyph List" name="GlyphList" generic-name="glyphlist" parent="GtkFlowBox"/>
+   <glade-widget-class title="Glyph Item" name="GlyphItem" generic-name="glyphitem" parent="GtkFlowBoxChild"/>
    <glade-widget-class title="Toolbar" name="Toolbar" generic-name="toolbar" parent="GtkToolbar"/>
    <glade-widget-class title="Canvas" name="Canvas" generic-name="canvas" parent="GtkDrawingArea"/>
-   <glade-widget-class title="DialogAskSave" name="DialogAskSave" generic-name="dialogasksave" parent="GtkDialog"/>
-   <glade-widget-class title="DialogExport" name="DialogExport" generic-name="dialogexport" parent="GtkDialog"/>
-   <glade-widget-class title="DateEntry" name="DateEntry" generic-name="dateentry" parent="GtkEntry"/>
-   <glade-widget-class title="WindowFontInfo" name="WindowFontInfo" generic-name="windowfontinfo" parent="GtkWindow"/>
-   <glade-widget-class title="MasterStackItem" name="MasterStackItem" generic-name="masterstackitem" parent="GtkBox"/>
-   <glade-widget-class title="InstanceStackItem" name="InstanceStackItem" generic-name="instancestackitem" parent="GtkBox"/>
-   <glade-widget-class title="GlyphInfos" name="GlyphInfos" generic-name="glyphinfos" parent="GtkGrid"/>
+   <glade-widget-class title="Dialog Ask Save" name="DialogAskSave" generic-name="dialogasksave" parent="GtkDialog"/>
+   <glade-widget-class title="Dialog Export" name="DialogExport" generic-name="dialogexport" parent="GtkDialog"/>
+   <glade-widget-class title="Date Entry" name="DateEntry" generic-name="dateentry" parent="GtkEntry"/>
+   <glade-widget-class title="Window FontInfo" name="WindowFontInfo" generic-name="windowfontinfo" parent="GtkWindow"/>
+   <glade-widget-class title="Master Stack Item" name="MasterStackItem" generic-name="masterstackitem" parent="GtkBox"/>
+   <glade-widget-class title="Instance Stack Item" name="InstanceStackItem" generic-name="instancestackitem" parent="GtkBox"/>
+   <glade-widget-class title="Glyph Infos" name="GlyphInfos" generic-name="glyphinfos" parent="GtkGrid"/>
  </glade-widget-classes>
 
- <glade-widget-group name="stroked" title="Stroked">
+ <glade-widget-group name="stroked" title="Stroked Widgets">
    <glade-widget-class-ref name="TextEntry"/>
    <glade-widget-class-ref name="FloatEntry"/>
    <glade-widget-class-ref name="HexEntry"/>

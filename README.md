@@ -70,6 +70,13 @@ Files installed:
 - `space.autre.stroked.desktop` file in `/usr/local/share/applications/`
 - `stroked` file script in `usr/local/bin/`
 
+
+## GLADE
+
+In `glade` preferences, simply add a path to `data/` to load the custom catalog.  
+There's no special behavior but at least you wont get errors.
+
+
 ## Licence
 
 Copyright (C) 2020 Nicolas Chesnais
