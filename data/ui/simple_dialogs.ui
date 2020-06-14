@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.36.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkImage" id="delete_icon">
+  <object class="GtkImage" id="delete-icon">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="stock">gtk-delete</property>
+    <property name="icon_name">edit-delete</property>
+  </object>
+  <object class="GtkImage" id="save-icon">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="icon_name">document-save</property>
   </object>
   <template class="DialogAskSave" parent="GtkDialog">
     <property name="can_focus">False</property>
@@ -19,20 +24,18 @@
     <property name="urgency_hint">True</property>
     <property name="decorated">False</property>
     <signal name="delete-event" handler="on_delete" swapped="no"/>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can_focus">False</property>
-        <property name="margin_left">20</property>
-        <property name="margin_right">20</property>
+        <property name="margin_start">20</property>
+        <property name="margin_end">20</property>
         <property name="margin_top">10</property>
         <property name="margin_bottom">20</property>
         <property name="orientation">vertical</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can_focus">False</property>
+            <property name="halign">end</property>
             <property name="layout_style">center</property>
             <child>
               <object class="GtkButton" id="button3">
@@ -41,7 +44,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="image">delete_icon</property>
+                <property name="image">delete-icon</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -51,11 +54,11 @@
             </child>
             <child>
               <object class="GtkButton" id="button1">
-                <property name="label">gtk-cancel</property>
+                <property name="label">_Cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
+                <property name="use_underline">True</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -65,12 +68,13 @@
             </child>
             <child>
               <object class="GtkButton" id="button2">
-                <property name="label">gtk-save</property>
+                <property name="label">_Save</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
+                <property name="image">save-icon</property>
+                <property name="use_underline">True</property>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -112,5 +116,8 @@
       <action-widget response="-6">button1</action-widget>
       <action-widget response="-8">button2</action-widget>
     </action-widgets>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
   </template>
 </interface>
