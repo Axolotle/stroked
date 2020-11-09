@@ -1,0 +1,15 @@
+# List of source files which contain translatable strings.
+
+data/ui/export_dialog.ui
+data/ui/font_info_window.ui
+data/ui/glyph_item.ui
+data/ui/glyph_list.ui
+data/ui/instance_stack_item.ui
+data/ui/master_stack_item.ui
+data/ui/menubar.ui
+data/ui/panels.ui
+data/ui/simple_dialogs.ui
+data/ui/tabs.ui
+data/ui/window.ui
+
+data/space.autre.stroked.desktop.in

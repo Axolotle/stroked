@@ -2,24 +2,33 @@
 
 import os
 import sys
-
-from gi.repository import Gio
+import gettext
+import locale
 
 
 VERSION = '@VERSION@'
 pkgdatadir = '@pkgdatadir@'
+localedir = '@localedir@'
 srcdir = pkgdatadir
 builddir = os.environ.get('MESON_BUILD_ROOT')
 if builddir:
     pkgdatadir = os.path.join(builddir, 'data')
     srcdir = os.environ.get('MESON_SOURCE_ROOT')
 
+locale.setlocale(locale.LC_ALL, '')
+locale.bindtextdomain('stroked', localedir)
+locale.textdomain('stroked')
+
+gettext.bindtextdomain('stroked', localedir)
+gettext.textdomain('stroked')
+gettext.install('stroked', localedir)
+
 sys.path.insert(1, srcdir)
 
-resource = Gio.resource_load(os.path.join(pkgdatadir, 'stroked.gresource'))
-Gio.Resource._register(resource)
-
 if __name__ == "__main__":
-    from stroked import app
+    from gi.repository import Gio
+    resource = Gio.Resource.load(os.path.join(pkgdatadir, 'stroked.gresource'))
+    resource._register()
 
+    from stroked import app
     app.main(version=VERSION)

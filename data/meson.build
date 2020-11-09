@@ -7,10 +7,11 @@ stroked_resources = gnome.compile_resources('stroked',
   install_dir: pkgdatadir
 )
 
-stroked_desktop = configure_file(
-  input: 'space.autre.stroked.desktop',
+stroked_desktop = i18n.merge_file(
+  input: 'space.autre.stroked.desktop.in',
   output: 'space.autre.stroked.desktop',
-  copy: true,
+  type: 'desktop',
+  po_dir: '../po',
   install: true,
   install_dir: join_paths(get_option('datadir'), 'applications')
 )

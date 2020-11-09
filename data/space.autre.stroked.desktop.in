@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Stroked
+Comment=Stroke-based font editor
+Icon=space.autre.stroked
+Exec=stroked
+Terminal=false
+Type=Application
+Categories=GTK;Graphics;2DGraphics;VectorGraphics;
+Keywords=Font;Editor;UFO;OTF;TTF;SVG;
+StartupNotify=false

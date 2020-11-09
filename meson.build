@@ -1,9 +1,10 @@
 project('stroked',
   version: '0.1.0',
-  meson_version: '>= 0.49.2',
+  meson_version: '>= 0.50.0',
 )
 
 python = import('python')
+i18n = import('i18n')
 # Module objects
 py_installation = python.find_installation('python3')
 # Make sure Python is installed and found
@@ -33,3 +34,4 @@ install_subdir(
 )
 subdir('data')
 subdir('bin')
+subdir('po')

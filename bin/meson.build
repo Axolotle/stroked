@@ -3,6 +3,7 @@ prefix = get_option('prefix')
 cdata = configuration_data()
 cdata.set('VERSION', meson.project_version())
 cdata.set('pkgdatadir', join_paths(prefix, pkgdatadir))
+cdata.set('localedir', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
 
 configure_file(
   input: 'stroked.in',

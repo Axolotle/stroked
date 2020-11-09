@@ -1,63 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.36.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkImage" id="properties-image">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">document-properties</property>
-  </object>
   <object class="GtkMenuBar" id="menubar">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
+    <property name="valign">start</property>
+    <property name="vexpand">False</property>
     <child>
       <object class="GtkMenuItem">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">_Fichier</property>
+        <property name="label" translatable="yes">_File</property>
         <property name="use_underline">True</property>
         <child type="submenu">
           <object class="GtkMenu">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-new</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="action_name">app.new</property>
+                <property name="label" translatable="yes">_New</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-open</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="action_name">app.open</property>
+                <property name="label" translatable="yes">_Open</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-save</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="action_name">app.save</property>
+                <property name="label" translatable="yes">_Save</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-save-as</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="action_name">app.save_as</property>
+                <property name="label" translatable="yes">Save _As</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
             <child>
@@ -65,7 +58,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="action_name">win.export</property>
-                <property name="label" translatable="yes">Export</property>
+                <property name="label" translatable="yes">_Export</property>
+                <property name="use_underline">True</property>
               </object>
             </child>
             <child>
@@ -75,13 +69,12 @@
               </object>
             </child>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-quit</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="action_name">app.quit</property>
+                <property name="label" translatable="yes">_Quit</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
           </object>
@@ -92,47 +85,42 @@
       <object class="GtkMenuItem">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">É_dition</property>
+        <property name="label" translatable="yes">_Edit</property>
         <property name="use_underline">True</property>
         <child type="submenu">
           <object class="GtkMenu">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-cut</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Cu_t</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-copy</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Copy</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-paste</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Paste</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">gtk-delete</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Delete</property>
                 <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
-                <signal name="activate" handler="on_delete" swapped="no"/>
               </object>
             </child>
           </object>
@@ -143,7 +131,7 @@
       <object class="GtkMenuItem">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">_Affichage</property>
+        <property name="label" translatable="yes">_View</property>
         <property name="use_underline">True</property>
       </object>
     </child>
@@ -151,21 +139,19 @@
       <object class="GtkMenuItem">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">F_ont</property>
+        <property name="label" translatable="yes">_Font</property>
         <property name="use_underline">True</property>
         <child type="submenu">
           <object class="GtkMenu">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkImageMenuItem">
-                <property name="label">Font _Info</property>
+              <object class="GtkMenuItem">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="action_name">win.font_info</property>
+                <property name="label" translatable="yes">Font _Info</property>
                 <property name="use_underline">True</property>
-                <property name="image">properties-image</property>
-                <property name="use_stock">False</property>
               </object>
             </child>
           </object>
@@ -176,23 +162,8 @@
       <object class="GtkMenuItem">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Aid_e</property>
+        <property name="label" translatable="yes">_Help</property>
         <property name="use_underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkImageMenuItem">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_underline">True</property>
-                <property name="use_stock">True</property>
-                <signal name="activate" handler="on_about" swapped="no"/>
-              </object>
-            </child>
-          </object>
-        </child>
       </object>
     </child>
   </object>

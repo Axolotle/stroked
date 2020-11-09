@@ -77,6 +77,17 @@ In `glade` preferences, simply add a path to `data/` to load the custom catalog.
 There's no special behavior but at least you wont get errors.
 
 
+## TRANSLATION
+
+```bash
+# generate pot files
+ninja -C _build stroked-pot
+# generate po files
+ninja -C _build stroked-update-po
+# compile mo files
+ninja -C _build stroked-gmo
+```
+
 ## Licence
 
 Copyright (C) 2020 Nicolas Chesnais

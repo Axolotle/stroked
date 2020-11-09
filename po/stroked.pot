@@ -1,0 +1,502 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the stroked package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: stroked\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-11-09 14:17+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/ui/export_dialog.ui:25 data/ui/simple_dialogs.ui:58
+msgid "_Cancel"
+msgstr ""
+
+#: data/ui/export_dialog.ui:39 data/ui/menubar.ui:61
+msgid "_Export"
+msgstr ""
+
+#: data/ui/export_dialog.ui:84 data/ui/export_dialog.ui:212
+#: data/ui/export_dialog.ui:324
+msgid "Select masters to export:"
+msgstr ""
+
+#: data/ui/export_dialog.ui:123
+msgid "Save as TTF instead"
+msgstr ""
+
+#: data/ui/export_dialog.ui:145 data/ui/export_dialog.ui:255
+#: data/ui/export_dialog.ui:367
+msgid "Export destination:"
+msgstr ""
+
+#: data/ui/export_dialog.ui:162 data/ui/export_dialog.ui:272
+#: data/ui/export_dialog.ui:384
+msgid "Choose a folder"
+msgstr ""
+
+#: data/ui/export_dialog.ui:186
+msgid "otf"
+msgstr ""
+
+#: data/ui/export_dialog.ui:297
+msgid "ufo"
+msgstr ""
+
+#: data/ui/export_dialog.ui:409
+msgid "svg"
+msgstr ""
+
+#: data/ui/font_info_window.ui:62
+msgid "Basic infos"
+msgstr ""
+
+#: data/ui/font_info_window.ui:84
+msgid "Designer"
+msgstr ""
+
+#: data/ui/font_info_window.ui:107
+msgid "Designer url"
+msgstr ""
+
+#: data/ui/font_info_window.ui:129
+msgid "Copyright"
+msgstr ""
+
+#: data/ui/font_info_window.ui:151
+msgid "License"
+msgstr ""
+
+#: data/ui/font_info_window.ui:173
+msgid "Version"
+msgstr ""
+
+#: data/ui/font_info_window.ui:185
+msgid "Creation date"
+msgstr ""
+
+#: data/ui/font_info_window.ui:197
+msgid "Family name"
+msgstr ""
+
+#: data/ui/font_info_window.ui:242
+msgid "."
+msgstr ""
+
+#: data/ui/font_info_window.ui:258 data/ui/window.ui:225 data/ui/window.ui:384
+msgid "1,000"
+msgstr ""
+
+#: data/ui/font_info_window.ui:284
+msgid "YYYY/MM/DD HH:MM:SS"
+msgstr ""
+
+#: data/ui/font_info_window.ui:313
+msgid "Grid size"
+msgstr ""
+
+#: data/ui/font_info_window.ui:335
+msgid "Height"
+msgstr ""
+
+#: data/ui/font_info_window.ui:347 data/ui/instance_stack_item.ui:46
+#: data/ui/master_stack_item.ui:143 data/ui/panels.ui:43 data/ui/window.ui:169
+#: data/ui/window.ui:328
+msgid "Width"
+msgstr ""
+
+#: data/ui/font_info_window.ui:360 data/ui/font_info_window.ui:374
+#: data/ui/instance_stack_item.ui:315 data/ui/master_stack_item.ui:270
+#: data/ui/master_stack_item.ui:284 data/ui/master_stack_item.ui:311
+#: data/ui/master_stack_item.ui:338
+msgid "10"
+msgstr ""
+
+#: data/ui/font_info_window.ui:406 data/ui/instance_stack_item.ui:422
+#: data/ui/master_stack_item.ui:370
+msgid "Custom parameters"
+msgstr ""
+
+#: data/ui/font_info_window.ui:433 data/ui/menubar.ui:142
+msgid "_Font"
+msgstr ""
+
+#: data/ui/font_info_window.ui:498 data/ui/font_info_window.ui:499
+#: data/ui/font_info_window.ui:607 data/ui/font_info_window.ui:608
+msgid "add a master"
+msgstr ""
+
+#: data/ui/font_info_window.ui:513 data/ui/font_info_window.ui:622
+msgid "remove a master"
+msgstr ""
+
+#: data/ui/font_info_window.ui:514 data/ui/font_info_window.ui:623
+msgid "remove master"
+msgstr ""
+
+#: data/ui/font_info_window.ui:541
+msgid "_Masters"
+msgstr ""
+
+#: data/ui/font_info_window.ui:650
+msgid "_Instances"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:24
+msgid "Naming"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:60
+msgid "UltraCondensed"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:61
+msgid "ExtraCondensed"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:62 data/ui/master_stack_item.ui:191
+msgid "Condensed"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:63
+msgid "SemiCondensed"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:64
+msgid "Medium (normal)"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:65
+msgid "SemiExpanded"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:66
+msgid "Expanded"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:67
+msgid "ExtraExpanded"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:68
+msgid "UltraExpanded"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:80 data/ui/master_stack_item.ui:155
+msgid "Weight"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:95
+msgid "Thin (ExtraLight, UltraLight)"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:96 data/ui/master_stack_item.ui:31
+#: data/ui/master_stack_item.ui:171
+msgid "Light"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:97
+msgid "Regular (Normal)"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:98 data/ui/master_stack_item.ui:37
+#: data/ui/master_stack_item.ui:173
+msgid "Medium"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:99
+msgid "SemiBold (DemiBold)"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:100 data/ui/instance_stack_item.ui:184
+#: data/ui/master_stack_item.ui:43 data/ui/master_stack_item.ui:175
+msgid "Bold"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:101
+msgid "ExtraBold (UltraBold)"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:102
+msgid "Black (Heavy)"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:114
+msgid "Style Name"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:155
+msgid "Style Linking"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:174
+msgid "Is"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:200
+msgid " , "
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:210
+msgid "Italic"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:226
+msgid "of "
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:268
+msgid "Rendering"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:290
+msgid "Line Join"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:302
+msgid "Line Width"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:330
+msgid "Line Cap"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:343
+msgid "Single Point"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:358 data/ui/instance_stack_item.ui:390
+#: data/ui/window.ui:245 data/ui/window.ui:277 data/ui/window.ui:404
+#: data/ui/window.ui:436
+msgid "Miter"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:359 data/ui/instance_stack_item.ui:375
+#: data/ui/instance_stack_item.ui:391 data/ui/window.ui:246
+#: data/ui/window.ui:262 data/ui/window.ui:278 data/ui/window.ui:405
+#: data/ui/window.ui:421 data/ui/window.ui:437
+msgid "Round"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:360 data/ui/window.ui:247
+#: data/ui/window.ui:406
+msgid "Bevel"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:374 data/ui/window.ui:261
+#: data/ui/window.ui:420
+msgid "Butt"
+msgstr ""
+
+#: data/ui/instance_stack_item.ui:376 data/ui/instance_stack_item.ui:392
+#: data/ui/window.ui:263 data/ui/window.ui:279 data/ui/window.ui:422
+#: data/ui/window.ui:438
+msgid "Square"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:28 data/ui/master_stack_item.ui:170
+msgid "Thin"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:34 data/ui/master_stack_item.ui:172
+#: data/ui/master_stack_item.ui:192
+msgid "Regular"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:40 data/ui/master_stack_item.ui:174
+msgid "SemiBold"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:46 data/ui/master_stack_item.ui:176
+msgid "ExtraBold"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:49 data/ui/master_stack_item.ui:177
+msgid "Black"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:84 data/ui/panels.ui:17
+msgid "Name"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:121
+msgid "Proportions"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:193
+msgid "Extended"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:223
+msgid "Metrics"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:245
+msgid "Cap Height"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:257
+msgid "Ascender"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:298
+msgid "x-Height"
+msgstr ""
+
+#: data/ui/master_stack_item.ui:325
+msgid "Descender"
+msgstr ""
+
+#: data/ui/menubar.ui:14
+msgid "_File"
+msgstr ""
+
+#: data/ui/menubar.ui:25
+msgid "_New"
+msgstr ""
+
+#: data/ui/menubar.ui:34
+msgid "_Open"
+msgstr ""
+
+#: data/ui/menubar.ui:43 data/ui/simple_dialogs.ui:72
+msgid "_Save"
+msgstr ""
+
+#: data/ui/menubar.ui:52
+msgid "Save _As"
+msgstr ""
+
+#: data/ui/menubar.ui:76
+msgid "_Quit"
+msgstr ""
+
+#: data/ui/menubar.ui:88
+msgid "_Edit"
+msgstr ""
+
+#: data/ui/menubar.ui:98
+msgid "Cu_t"
+msgstr ""
+
+#: data/ui/menubar.ui:106
+msgid "_Copy"
+msgstr ""
+
+#: data/ui/menubar.ui:114
+msgid "_Paste"
+msgstr ""
+
+#: data/ui/menubar.ui:122
+msgid "_Delete"
+msgstr ""
+
+#: data/ui/menubar.ui:134
+msgid "_View"
+msgstr ""
+
+#: data/ui/menubar.ui:153
+msgid "Font _Info"
+msgstr ""
+
+#: data/ui/menubar.ui:165
+msgid "_Help"
+msgstr ""
+
+#: data/ui/panels.ui:30
+msgid "Unicodes"
+msgstr ""
+
+#: data/ui/panels.ui:67
+msgid "Left"
+msgstr ""
+
+#: data/ui/panels.ui:80
+msgid "Right"
+msgstr ""
+
+#: data/ui/panels.ui:138
+msgid "Characters"
+msgstr ""
+
+#: data/ui/simple_dialogs.ui:42
+msgid "Close _without saving"
+msgstr ""
+
+#: data/ui/simple_dialogs.ui:99
+msgid ""
+"<span size=\"x-large\" weight=\"bold\">Save changes to the <i>\"{}\"</i> "
+"font before closing?</span>\n"
+"\n"
+"<span rise=\"100\">If you close without saving, your changes will be lost.</"
+"span>"
+msgstr ""
+
+#: data/ui/tabs.ui:31
+msgid "Glyph list"
+msgstr ""
+
+#: data/ui/window.ui:52
+msgid "Select Tool"
+msgstr ""
+
+#: data/ui/window.ui:66
+msgid "Pen Tool"
+msgstr ""
+
+#: data/ui/window.ui:182 data/ui/window.ui:341
+msgid "Linejoin"
+msgstr ""
+
+#: data/ui/window.ui:195 data/ui/window.ui:354
+msgid "Linecap"
+msgstr ""
+
+#: data/ui/window.ui:208 data/ui/window.ui:367
+msgid "Pointcap"
+msgstr ""
+
+#: data/ui/window.ui:290
+msgid "Basic"
+msgstr ""
+
+#: data/ui/window.ui:313
+msgid "Instances"
+msgstr ""
+
+#: data/ui/window.ui:449 data/space.autre.stroked.desktop.in:3
+msgid "Stroked"
+msgstr ""
+
+#: data/ui/window.ui:468
+msgid "Stroke preview"
+msgstr ""
+
+#: data/ui/window.ui:521
+msgid "Glyph Infos"
+msgstr ""
+
+#: data/ui/window.ui:559
+msgid "masters"
+msgstr ""
+
+#: data/ui/window.ui:583
+msgid "Layers"
+msgstr ""
+
+#: data/space.autre.stroked.desktop.in:4
+msgid "Stroke-based font editor"
+msgstr ""
+
+#: data/space.autre.stroked.desktop.in:10
+msgid "Font;Editor;UFO;OTF;TTF;SVG;"
+msgstr ""
