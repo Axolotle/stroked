@@ -7,9 +7,12 @@ from gi.repository import Gio, Gtk, GLib
 
 from fontTools.ufoLib.errors import UFOLibError
 
-from stroked.font import Font
-from stroked.window import StrokedWindow
-
+# Temp scope fix for cli
+try:
+    from stroked.font import Font
+    from stroked.window import StrokedWindow
+except:
+    print('cli')
 
 class Stroked(Gtk.Application):
     def __init__(self, version='', *args, **kwargs):
@@ -22,6 +25,8 @@ class Stroked(Gtk.Application):
         GLib.set_application_name('Stroked')
         GLib.set_prgname('space.autre.stroked')
         self.version = version
+        self.settings = Gio.Settings.new('space.autre.stroked')
+        print(self.settings)
 
         # Command line arguments definitions
         self.add_main_option(

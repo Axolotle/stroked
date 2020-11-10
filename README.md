@@ -65,10 +65,8 @@ sudo ninja -C _build uninstall
 sudo ninja uninstall
 ```
 
-Files installed:
-- `stroked` folder with the python scripts in `/usr/local/share/`
-- `space.autre.stroked.desktop` file in `/usr/local/share/applications/`
-- `stroked` file script in `usr/local/bin/`
+Files not removed after uninstall
+- locales files in `usr/local/share/locale/{lang}/LC_MESSAGES/stroked.mo`
 
 
 ## GLADE

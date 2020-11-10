@@ -15,6 +15,24 @@ stroked_resources = gnome.compile_resources(
 )
 
 
+# ╭───────────────╮
+# │ .GSCHEMA.XML  │
+# ╰───────────────╯
+
+# Install schema file
+install_data(
+  app_rdnn + '.gschema.xml',
+  install_dir: 'share/glib-2.0/schemas'
+)
+
+# Validate schemas
+compile_schemas = find_program('glib-compile-schemas', required: false)
+if compile_schemas.found()
+  test('Validate schema file', compile_schemas,
+    args: ['--strict', '--dry-run', meson.current_source_dir()]
+  )
+endif
+
 # ╭──────────╮
 # │ .DESKTOP │
 # ╰──────────╯
@@ -58,7 +76,7 @@ stroked_appdata = i18n.merge_file(
   install_dir: join_paths(datadir, 'metainfo')
 )
 
-# Validating the appdata file
+# Validate the appdata file
 appstream_util = find_program('appstream-util', required: false)
 if appstream_util.found()
   test (
@@ -67,3 +85,14 @@ if appstream_util.found()
     args: ['validate-relax', stroked_appdata]
   )
 endif
+
+
+# ╭───────╮
+# │ ICONS │
+# ╰───────╯
+
+# Install icon
+install_data(
+    app_rdnn + '.svg',
+    install_dir: join_paths(datadir, 'icons/hicolor/scalable/apps')
+)
