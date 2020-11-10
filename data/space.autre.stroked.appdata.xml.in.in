@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>@app_rdnn@.desktop</id>
+  <launchable type="desktop-id">@app_rdnn@.desktop</launchable>
+  <provides>
+    <id>@app_rdnn@.desktop</id>
+  </provides>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0</project_license>
+  <name>Stroked</name>
+  <summary>Stroked (single-line) font editor</summary>
+  <description>
+    <p>
+      Stroked is a restrictive grid font editor that allows you to create simple single-line
+      fonts (fonts defined as paths instead of shapes).
+    </p>
+    <p>
+      Since single-line fonts aren't supported by any font formats except svg, Stroked
+      allows you to automaticly offset your glyphs and export as multiple otf/tff font files.
+      You can also export to SVG and use it with the 'Hershey Text' plugin in Inkscape.
+    </p>
+  </description>
+
+  <releases>
+    <release version="0.1.0" date="2020-11-10">
+      <description>
+      </description>
+    </release>
+  </releases>
+  <developer_name>Nicolas CHESNAIS</developer_name>
+  <url type="homepage">@app_rdnn@</url>
+  <url type="bugtracker">https://github.com/Axolotle/stroked/issues</url>
+  <update_contact>contact@autre.space</update_contact>
+  <translation type="gettext">@app_rdnn@</translation>
+  <content_rating type="oars-1.1" />
+</component>

@@ -1,5 +1,8 @@
 # List of source files which contain translatable strings.
 
+data/space.autre.stroked.appdata.xml.in.in
+data/space.autre.stroked.desktop.in
+
 data/ui/export_dialog.ui
 data/ui/font_info_window.ui
 data/ui/glyph_item.ui
@@ -11,5 +14,3 @@ data/ui/panels.ui
 data/ui/simple_dialogs.ui
 data/ui/tabs.ui
 data/ui/window.ui
-
-data/space.autre.stroked.desktop.in

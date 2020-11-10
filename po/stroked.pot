@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: stroked\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-09 14:17+0100\n"
+"POT-Creation-Date: 2020-11-10 14:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,41 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: data/space.autre.stroked.appdata.xml.in.in:11
+#: data/space.autre.stroked.desktop.in:3 data/ui/window.ui:449
+msgid "Stroked"
+msgstr ""
+
+#: data/space.autre.stroked.appdata.xml.in.in:12
+msgid "Stroked (single-line) font editor"
+msgstr ""
+
+#: data/space.autre.stroked.appdata.xml.in.in:14
+msgid ""
+"Stroked is a restrictive grid font editor that allows you to create simple "
+"single-line fonts (fonts defined as paths instead of shapes)."
+msgstr ""
+
+#: data/space.autre.stroked.appdata.xml.in.in:18
+msgid ""
+"Since single-line fonts aren't supported by any font formats except svg, "
+"Stroked allows you to automaticly offset your glyphs and export as multiple "
+"otf/tff font files. You can also export to SVG and use it with the 'Hershey "
+"Text' plugin in Inkscape."
+msgstr ""
+
+#: data/space.autre.stroked.appdata.xml.in.in:31
+msgid "Nicolas CHESNAIS"
+msgstr ""
+
+#: data/space.autre.stroked.desktop.in:4
+msgid "Stroke-based font editor"
+msgstr ""
+
+#: data/space.autre.stroked.desktop.in:10
+msgid "Font;Editor;UFO;OTF;TTF;SVG;"
+msgstr ""
 
 #: data/ui/export_dialog.ui:25 data/ui/simple_dialogs.ui:58
 msgid "_Cancel"
@@ -473,10 +508,6 @@ msgstr ""
 msgid "Instances"
 msgstr ""
 
-#: data/ui/window.ui:449 data/space.autre.stroked.desktop.in:3
-msgid "Stroked"
-msgstr ""
-
 #: data/ui/window.ui:468
 msgid "Stroke preview"
 msgstr ""
@@ -491,12 +522,4 @@ msgstr ""
 
 #: data/ui/window.ui:583
 msgid "Layers"
-msgstr ""
-
-#: data/space.autre.stroked.desktop.in:4
-msgid "Stroke-based font editor"
-msgstr ""
-
-#: data/space.autre.stroked.desktop.in:10
-msgid "Font;Editor;UFO;OTF;TTF;SVG;"
 msgstr ""
