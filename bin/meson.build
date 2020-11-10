@@ -1,22 +1,18 @@
-prefix = get_option('prefix')
+# Create configuration variables for Stroked's executable.
+bin_conf = configuration_data()
+bin_conf.set('version', meson.project_version())
+bin_conf.set('pkgdatadir', pkgdatadir)
+bin_conf.set('localedir', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
 
-cdata = configuration_data()
-cdata.set('VERSION', meson.project_version())
-cdata.set('pkgdatadir', join_paths(prefix, pkgdatadir))
-cdata.set('localedir', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
-
+# Insert variables to Stroked's executable and install.
 configure_file(
   input: 'stroked.in',
   output: 'stroked',
-  configuration: cdata,
+  configuration: bin_conf,
   install: true,
   install_dir: get_option('bindir')
 )
 
+# Add 'run' command to ninja to be able to run the app from '_build/' without real install.
 stroked = join_paths(meson.build_root(), 'bin/stroked')
-run_target('run',
-  command: [stroked],
-  depends: [
-    stroked_resources
-  ]
-)
+run_target('run', command: [stroked], depends: [stroked_resources])
