@@ -1,3 +1,5 @@
+import os
+
 from gi.repository import Gtk, Gdk, Gio
 
 from stroked.ui import dialogs
@@ -17,11 +19,10 @@ class StrokedWindow(Gtk.ApplicationWindow):
         title = '{} - Stroked'.format(filename)
         super().__init__(application=app, title=title)
 
-        builder = Gtk.Builder.new_from_resource(
-            '/space/autre/stroked/ui/menubar.ui')
-        self.set_titlebar(builder.get_object('menubar'))
+        self._set_window_actions()
 
-        self.set_actions(app)
+        for z in self.props:
+            print(z)
 
         self.tabs.connect(
             'current_glyph_changed', self.on_current_glyph_changed)
@@ -47,24 +48,72 @@ class StrokedWindow(Gtk.ApplicationWindow):
         self.current_glyph = None
 
     # ╭──────────────────────╮
-    # │ GTK ACTIONS HANDLERS │
+    # │ WINDOW ACTIONS SETUP │
     # ╰──────────────────────╯
 
-    def set_actions(self, app):
-        actions = [
-            ['font_info', ['<primary>i']],
-            ['export', ['<primary>e']],
+    def set_simple_action(self, name, handler=None, shortcuts=None):
+        action = Gio.SimpleAction.new(name, None)
+        action.connect(
+            'activate', getattr(self, 'on_' + name) if handler is None else handler
+        )
+        self.add_action(action)
+        if shortcuts is not None:
+            self.props.application.set_accels_for_action('win.' + name, shortcuts)
+
+    def _set_window_actions(self):
+        window_simple_actions = [
+            # File
+            ('save', ['<primary>s']),
+            ('save_as', ['<primary><shift>s']),
+            ('export', ['<primary>e']),
+            ('close', ['<primary><shift>w']),
+            # Font
+            ('font_info', ['<primary>i']),
         ]
 
-        for name, shortcuts in actions:
-            action = Gio.SimpleAction.new(name, None)
-            action.connect('activate', getattr(self, 'on_' + name))
-            self.add_action(action)
-            app.set_accels_for_action('win.' + name, shortcuts)
+        for name, shortcuts in window_simple_actions:
+            self.set_simple_action(name, shortcuts=shortcuts)
 
-    def on_font_info(self, action, param):
-        dialog = dialogs.WindowFontInfo(self)
-        dialog.show()
+    # ╭─────────────────────────╮
+    # │ WINDOW ACTIONS HANDLERS │
+    # ╰─────────────────────────╯
+
+    def on_save(self, *args):
+        saved = False
+        if self.path is None:
+            saved = self.on_save_as()
+        else:
+            self.font.save(path=self.path)
+            self.on_font_changed()
+            saved = True
+        return saved
+
+    def on_save_as(self, *args):
+        saved = False
+        dialog = Gtk.FileChooserDialog(
+            'Please choose a folder name',
+            self,
+            Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+        )
+        dialog.set_current_name('untitled.ufo')
+        dialog.set_modal(True)
+        dialog.set_do_overwrite_confirmation(True)
+
+        response = dialog.run()
+        path = dialog.get_filename()
+        dialog.destroy()
+        if response == Gtk.ResponseType.OK:
+            ext = os.path.splitext(path)[-1]
+            if ext != '.ufo':
+                path += '.ufo'
+            self.font.save(path=path)
+            self.filename = os.path.split(path)[-1]
+            self.path = path
+            self.on_font_changed()
+            saved = True
+        return saved
 
     def on_export(self, action, param):
         dialog = dialogs.DialogExport(self)
@@ -75,6 +124,25 @@ class StrokedWindow(Gtk.ApplicationWindow):
                                   for name in options['masters']]
             self.font.export(options['path'], options['format'], options['masters'])
         dialog.destroy()
+
+    @Gtk.Template.Callback('on_close')
+    def on_close(self, *args):
+        close = True
+        if self.font.dirty:
+            dialog = dialogs.DialogAskSave(self)
+            response = dialog.run()
+            dialog.destroy()
+            if response == Gtk.ResponseType.YES:
+                close = self.on_save()
+            elif response == Gtk.ResponseType.CANCEL:
+                close = False
+        if close:
+            self.destroy()
+        return close
+
+    def on_font_info(self, action, param):
+        dialog = dialogs.WindowFontInfo(self)
+        dialog.show()
 
     # ╭─────────────────────╮
     # │ GTK EVENTS HANDLERS │
@@ -98,23 +166,6 @@ class StrokedWindow(Gtk.ApplicationWindow):
         key_name = Gdk.keyval_name(event.keyval)
         if key_name == 'w':
             self.tabs.close_tab()
-
-    @Gtk.Template.Callback('on_close')
-    def _on_close(self, window=None, event=None):
-        stop_propagation = False
-        if self.font.dirty:
-            dialog = dialogs.DialogAskSave(self)
-            response = dialog.run()
-            dialog.destroy()
-            if response == Gtk.ResponseType.YES:
-                saved = self.get_application().on_save()
-                stop_propagation = not saved
-            elif response == Gtk.ResponseType.NO:
-                stop_propagation = False
-            elif response == Gtk.ResponseType.CANCEL:
-                stop_propagation = True
-
-        return stop_propagation
 
     @Gtk.Template.Callback('on_master_select_changed')
     def _on_master_select_changed(self, selection):
