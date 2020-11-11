@@ -3,7 +3,7 @@ import signal
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gio, Gtk, GLib
+from gi.repository import Gio, Gtk, Gdk, GLib
 
 from fontTools.ufoLib.errors import UFOLibError
 
@@ -24,9 +24,10 @@ class Stroked(Gtk.Application):
         )
         GLib.set_application_name('Stroked')
         GLib.set_prgname('space.autre.stroked')
+        self._init_style()
+
         self.version = version
         self.settings = Gio.Settings.new('space.autre.stroked')
-        print(self.settings)
 
         # Command line arguments definitions
         self.add_main_option(
@@ -105,6 +106,14 @@ class Stroked(Gtk.Application):
             action.connect('activate', getattr(self, 'on_' + name))
             self.add_action(action)
             self.set_accels_for_action('app.' + name, shortcuts)
+    def _init_style(self):
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_resource('/space/autre/stroked/space.autre.stroked.css')
+        screen = Gdk.Screen.get_default()
+        style_context = Gtk.StyleContext()
+        style_context.add_provider_for_screen(
+            screen, css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
 
     def display_error(self, primary_msg, secondary_msg=None):
         window = self.get_active_window()
